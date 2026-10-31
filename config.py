@@ -25,7 +25,7 @@ LOG_FILE = ROOT / "MODULES_LOG.md"
 # --------------------------------------------------------------------------
 # Brand, bahasa, mode
 # --------------------------------------------------------------------------
-BRAND_NAME = "Tiny Steps Studio"
+BRAND_NAME = "Sleepless Learning"
 LANGS = ("en", "id", "es", "de", "fr", "pt")
 DEFAULT_LANG = "en"
 FALLBACK_LANG = "en"
