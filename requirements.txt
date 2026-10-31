@@ -1,0 +1,4 @@
+reportlab>=4.0
+Pillow>=10.0
+pypdf>=4.0        # dipakai QC untuk memeriksa PDF hasil (jumlah halaman, font ter-embed)
+PyYAML>=6.0       # opsional: override konfigurasi lewat worksheet.yaml
