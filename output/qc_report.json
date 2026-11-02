@@ -1,8 +1,8 @@
 {
   "summary": {
-    "scopes": 2,
-    "fail": 0,
-    "warn": 2
+    "scopes": 3,
+    "fail": 2,
+    "warn": 3
   },
   "scopes": {
     "_global": {
@@ -35,7 +35,7 @@
       }
     },
     "vertical_lines": {
-      "status": "WARN",
+      "status": "PASS",
       "areas": {
         "i18n": {
           "status": "PASS",
@@ -46,21 +46,66 @@
           "findings": []
         },
         "images": {
-          "status": "WARN",
+          "status": "PASS",
+          "findings": []
+        },
+        "pdf": {
+          "status": "PASS",
+          "findings": []
+        },
+        "mode": {
+          "status": "PASS",
+          "findings": []
+        },
+        "content": {
+          "status": "PASS",
+          "findings": []
+        }
+      }
+    },
+    "vertical_lines@space": {
+      "status": "FAIL",
+      "areas": {
+        "i18n": {
+          "status": "PASS",
+          "findings": []
+        },
+        "layout": {
+          "status": "PASS",
+          "findings": []
+        },
+        "images": {
+          "status": "FAIL",
           "findings": [
             {
-              "level": "WARN",
-              "message": "12 gambar masih placeholder: balloon, cloud, cupcake, flame, flower_head, grass_tuft, … (+6)",
+              "level": "FAIL",
+              "message": "'icon_pencil.png' resolusi 96x96 terlalu kecil",
               "context": [
-                "en/bw",
-                "en/color"
+                "id/bw",
+                "id/color"
+              ]
+            },
+            {
+              "level": "WARN",
+              "message": "10 gambar masih placeholder: balloon, cloud, cupcake, flame, flower_head, grass_tuft, … (+4)",
+              "context": [
+                "id/bw",
+                "id/color"
               ]
             }
           ]
         },
         "pdf": {
-          "status": "PASS",
-          "findings": []
+          "status": "WARN",
+          "findings": [
+            {
+              "level": "WARN",
+              "message": "Ukuran file 10.5 MB cukup besar",
+              "context": [
+                "id/color"
+              ]
+            }
+          ]
         },
         "mode": {
           "status": "PASS",

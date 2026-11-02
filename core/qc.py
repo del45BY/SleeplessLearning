@@ -5,6 +5,7 @@ Level: PASS < WARN < FAIL. Laporan ditulis ke output/qc_report.md dan qc_report.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import re
@@ -20,7 +21,7 @@ import config
 from core import registry
 from core.assets import AssetResolver
 from core.i18n import I18nError, Translator, load_language
-from core.layout import SAFE_AREA, Rect, has_glyph, register_fonts, text_width_mm
+from core.layout import PageRecord, SAFE_AREA, Rect, has_glyph, register_fonts, text_width_mm
 from core.renderer import Renderer, RenderResult
 from core.theme import BW_PALETTE, contrast_vs_white, get_theme, is_gray, relative_luminance
 from modules.base import BaseModule
@@ -146,6 +147,20 @@ def check_global(rep: QCReport, module_ids: Set[str]) -> None:
             rep.add("FAIL", "mode", GLOBAL, f"Tema {name} kehilangan warna: {sorted(missing)}")
     if not all(is_gray(get_theme("bw").rgb(n)) for n in BW_PALETTE):
         rep.add("FAIL", "mode", GLOBAL, "Palet bw mengandung warna non-abu-abu")
+    for e in registry.skin_errors():
+        rep.add("FAIL", "layout", GLOBAL, f"Skin: {e}")
+    for sk in registry.all_skins():
+        for mode in config.MODES:
+            try:
+                th = get_theme(mode, sk.name)
+            except KeyError as exc:
+                rep.add("FAIL", "mode", GLOBAL, f"Tema skin '{sk.name}': {exc}")
+                continue
+            if mode == "bw" and not all(is_gray(th.rgb(n)) for n in th.palette):
+                rep.add("FAIL", "mode", GLOBAL, f"Palet bw skin '{sk.name}' mengandung warna non-abu-abu")
+        bad = [i for i in sk.images() if not re.match(r"^[a-z0-9][a-z0-9_]*$", i)]
+        if bad:
+            rep.add("FAIL", "images", GLOBAL, f"Skin '{sk.name}': nama PNG tidak valid {bad}")
     try:
         en = load_language("en")
     except I18nError as exc:
@@ -195,6 +210,8 @@ def _check_layout(rep: QCReport, res: RenderResult) -> None:
         els = rec.elements
         for el in els:
             r = el.rect
+            if el.zone == "decor":
+                continue                      # dekorasi dicek terpisah di _check_decor
             if not SAFE_AREA.contains(r):
                 rep.add("FAIL", "layout", S, f"hal.{pg}: {el.kind} keluar dari safe area {r.as_list()}", *ctx)
             if el.zone == "content" and not rec.content_rect.contains(r):
@@ -213,7 +230,7 @@ def _check_layout(rep: QCReport, res: RenderResult) -> None:
                 bad = sorted({ch for ch in el.text if not ch.isspace() and not has_glyph(el.font, ch)})
                 if bad:
                     rep.add("FAIL", "i18n", S, f"Glyph tidak ada di font untuk {bad} pada '{el.text}'", *ctx)
-        flat = [e for e in els if e.kind != "rule"]
+        flat = [e for e in els if e.kind != "rule" and e.zone != "decor"]
         for i, a in enumerate(flat):
             for b in flat[i + 1:]:
                 if a.rect.overlap_area(b.rect) <= 0.25:
@@ -336,6 +353,9 @@ def _check_mode(rep: QCReport, res: RenderResult, assets: AssetResolver) -> None
     for iid in sorted({e.image for r in res.records for e in r.elements if e.image}):
         if not assets.is_gray_image(assets.path(iid, "bw")):
             rep.add("FAIL", "mode", S, f"Gambar bw '{iid}' bukan grayscale", *ctx)
+    for iid in sorted({e.skin_image for r in res.records for e in r.elements if e.skin_image}):
+        if not assets.is_gray_image(assets.skin_path(res.skin, iid, "bw")):
+            rep.add("FAIL", "mode", S, f"Gambar skin bw '{iid}' bukan grayscale", *ctx)
 
 
 def _expected(spec: Tuple) -> List:
@@ -369,13 +389,154 @@ def _check_content(rep: QCReport, res: RenderResult) -> None:
             rep.add("FAIL", "content", S, f"{m.id}.qc_extra() error: {exc!r}", *ctx)
 
 
-def check_result(rep: QCReport, res: RenderResult, assets: Optional[AssetResolver] = None) -> None:
+# ----------------------------------------------------------------------------
+# Skin: dekorasi, PNG skin, konsistensi, baseline classic
+# ----------------------------------------------------------------------------
+PAGE_RECT = Rect(0.0, 0.0, config.PAGE_W_MM, config.PAGE_H_MM)
+
+
+def _el_row(e) -> list:
+    # struktur tata letak saja: teks terjemahan/nama gambar/nilai tidak ikut, jadi edit i18n tidak memicu FAIL
+    return [e.kind, e.rect.as_list(), e.zone, e.container, e.within.as_list() if e.within else None,
+            e.font, round(e.size, 2), e.group]
+
+
+def layout_fingerprint(records: Sequence[PageRecord]) -> List[list]:
+    """Sidik jari tata letak per halaman: [n_semua, sha_semua, n_konten, sha_konten].
+    'semua' = seluruh elemen non-dekorasi (harus identik dengan baseline untuk classic);
+    'konten' = hanya elemen milik modul (harus identik di SEMUA skin)."""
+    out = []
+    for rec in records:
+        base = [e for e in rec.elements if e.zone != "decor"]
+        cont = [e for e in base if e.zone == "content"]
+        h = lambda rows: hashlib.sha1(json.dumps(rows, ensure_ascii=False).encode()).hexdigest()
+        out.append([len(base), h([_el_row(e) for e in base]), len(cont), h([_el_row(e) for e in cont])])
+    return out
+
+
+def load_baseline() -> Optional[Dict[str, list]]:
+    p = config.BASELINE_FILE
+    return json.loads(p.read_text(encoding="utf-8")) if p.is_file() else None
+
+
+def write_baseline(results: Iterable[RenderResult]) -> Path:
+    """Simpan sidik jari classic (mode color) untuk semua modul x bahasa."""
+    data: Dict[str, list] = {}
+    for r in results:
+        if len(r.modules) == 1 and r.skin == config.DEFAULT_SKIN and r.mode == "color":
+            data[f"{r.modules[0].id}|{r.lang}"] = layout_fingerprint(r.records)
+    config.BASELINE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    config.BASELINE_FILE.write_text(json.dumps(data, indent=1, sort_keys=True), encoding="utf-8")
+    return config.BASELINE_FILE
+
+
+def _check_decor(rep: QCReport, res: RenderResult) -> None:
+    """Dekorasi hanya boleh di margin/header/footer/latar/sudut: tidak menimpa area konten atau elemen sistem."""
+    S, ctx = res.scope, (res.lang, res.mode)
+    near_edge: Set[str] = set()
+    per_kind: Dict[Tuple[str, str], Set[str]] = {}
+    for rec in res.records:
+        pg = rec.spec.page_number
+        decor = [e for e in rec.elements if e.zone == "decor"]
+        if res.skin == config.DEFAULT_SKIN and decor:
+            rep.add("FAIL", "layout", S, f"hal.{pg}: skin classic menghasilkan {len(decor)} elemen dekorasi", *ctx)
+        for d in decor:
+            r = d.rect
+            if not PAGE_RECT.contains(r):
+                rep.add("FAIL", "layout", S, f"hal.{pg}: dekorasi {d.kind} keluar dari halaman {r.as_list()}", *ctx)
+            if min(r.x, r.y, PAGE_RECT.right - r.right, PAGE_RECT.bottom - r.bottom) < config.SKIN_PRINT_SAFE_MM:
+                near_edge.add(d.kind)
+            if r.overlap_area(rec.content_rect) > 0.25:
+                rep.add("FAIL", "layout", S, f"hal.{pg}: dekorasi {d.kind} menimpa area konten modul {r.as_list()}", *ctx)
+            for e in rec.elements:
+                if e is d or e.zone == "decor" or e.kind == "rule" or r.overlap_area(e.rect) <= 0.25:
+                    continue
+                if e.zone == "system" and d.container and r.contains(e.rect):
+                    continue                  # mis. pita di belakang judul, kotak nama/tanggal, badge + ikon
+                rep.add("FAIL", "layout", S, f"hal.{pg}: dekorasi {d.kind} menimpa {e.kind} "
+                        f"('{e.text or e.image}')", *ctx)
+        key = (rec.spec.module_id, rec.spec.kind)
+        rows = json.dumps(sorted([d.kind, d.rect.as_list(), d.container, d.skin_image] for d in decor
+                                 if d.kind != "decor_progress"), ensure_ascii=False)
+        per_kind.setdefault(key, set()).add(rows)
+    if near_edge:
+        rep.add("WARN", "layout", S, f"Dekorasi terlalu dekat tepi kertas (< {config.SKIN_PRINT_SAFE_MM} mm, "
+                f"bisa terpotong printer): {sorted(near_edge)}", *ctx)
+    for (mid, kind), variants in per_kind.items():
+        if len(variants) > 1:
+            rep.add("FAIL", "layout", S, f"Pola dekorasi tidak konsisten antar halaman ({mid or kind}): "
+                    f"{len(variants)} variasi (hanya 'decor_progress' yang boleh berubah)", *ctx)
+
+
+def _check_skin_images(rep: QCReport, res: RenderResult, assets: AssetResolver) -> None:
+    S, ctx = res.scope, (res.lang, res.mode)
+    try:
+        declared = set(registry.get_skin(res.skin).images())
+    except Exception as exc:
+        rep.add("FAIL", "images", S, f"Skin '{res.skin}': {exc}", *ctx)
+        return
+    used = {e.skin_image for r in res.records for e in r.elements if e.skin_image}
+    if used - declared:
+        rep.add("FAIL", "images", S, f"PNG skin dipakai tapi tidak dideklarasikan di images(): {sorted(used - declared)}", *ctx)
+    if declared - used:
+        rep.add("WARN", "images", S, f"PNG skin dideklarasikan tapi tidak dipakai: {sorted(declared - used)}", *ctx)
+    ph, small, noalpha = [], [], []
+    for iid in sorted(used | declared):
+        info = assets.skin_info(res.skin, iid)
+        if not info.exists:
+            rep.add("FAIL", "images", S, f"PNG skin '{res.skin}/{iid}.png' tidak ada", *ctx)
+        elif info.placeholder:
+            ph.append(iid)
+        else:
+            if min(info.width, info.height) < config.HARD_MIN_IMAGE_PX:
+                rep.add("FAIL", "images", S, f"PNG skin '{iid}' resolusi {info.width}x{info.height} terlalu kecil", *ctx)
+            elif min(info.width, info.height) < config.MIN_IMAGE_PX:
+                small.append(iid)
+            if not info.has_alpha:
+                noalpha.append(iid)
+    if ph:
+        rep.add("WARN", "images", S, f"{len(ph)} PNG skin '{res.skin}' masih placeholder: {', '.join(ph)}", *ctx)
+    if small:
+        rep.add("WARN", "images", S, f"PNG skin beresolusi < {config.MIN_IMAGE_PX}px: {', '.join(small)}", *ctx)
+    if noalpha:
+        rep.add("WARN", "images", S, f"PNG skin tanpa alpha channel: {', '.join(noalpha)}", *ctx)
+
+
+def _check_baseline(rep: QCReport, res: RenderResult, baseline: Optional[Dict[str, list]]) -> None:
+    """classic harus identik dengan baseline; skin lain: elemen konten modul harus identik dengan baseline."""
+    if len(res.modules) != 1 or res.scope.startswith("bundle"):
+        return
+    S, ctx = res.scope, (res.lang, res.mode)
+    key = f"{res.modules[0].id}|{res.lang}"
+    if baseline is None or key not in baseline:
+        rep.add("WARN", "content", S, "Belum ada baseline tata letak classic untuk modul ini "
+                "(jalankan `python main.py baseline`)", *ctx)
+        return
+    got, exp = layout_fingerprint(res.records), baseline[key]
+    if len(got) != len(exp):
+        rep.add("FAIL", "content", S, f"Jumlah halaman {len(got)} != baseline {len(exp)}", *ctx)
+        return
+    classic = res.skin == config.DEFAULT_SKIN
+    for i, (g, e) in enumerate(zip(got, exp), start=1):
+        if classic and g[:2] != e[:2]:
+            rep.add("FAIL", "content", S, f"hal.{i}: classic BERUBAH dari baseline (objek {g[0]} vs {e[0]}, "
+                    f"hash berbeda)", *ctx)
+        if not classic and g[2:] != e[2:]:
+            rep.add("FAIL", "content", S, f"hal.{i}: skin '{res.skin}' mengubah elemen konten modul "
+                    f"(objek {g[2]} vs {e[2]})", *ctx)
+
+
+def check_result(rep: QCReport, res: RenderResult, assets: Optional[AssetResolver] = None,
+                 baseline: Optional[Dict[str, list]] = None) -> None:
     """Jalankan semua cek untuk satu hasil render."""
     assets = assets or AssetResolver()
     rep.touch(res.scope)
     _check_render_i18n(rep, res)
     _check_layout(rep, res)
     _check_images(rep, res, assets)
+    _check_decor(rep, res)
+    _check_skin_images(rep, res, assets)
+    _check_baseline(rep, res, baseline)
     _check_pdf(rep, res)
     _check_mode(rep, res, assets)
     _check_content(rep, res)
@@ -383,7 +544,8 @@ def check_result(rep: QCReport, res: RenderResult, assets: Optional[AssetResolve
 
 def run_qc(modules: Sequence[BaseModule], langs: Sequence[str], modes: Sequence[str], *,
            results: Optional[Iterable[RenderResult]] = None, out_dir: Optional[Path] = None,
-           seed: Optional[int] = None, write: bool = True) -> QCReport:
+           seed: Optional[int] = None, write: bool = True,
+           skins: Sequence[str] = (config.DEFAULT_SKIN,)) -> QCReport:
     """Jalankan QC. Tanpa `results`, modul dirender dulu ke folder sementara."""
     out_dir = Path(out_dir or config.OUTPUT_DIR)
     rep = QCReport()
@@ -396,14 +558,17 @@ def run_qc(modules: Sequence[BaseModule], langs: Sequence[str], modes: Sequence[
         tmp = out_dir / "_qc_tmp"
         res_list: List[RenderResult] = []
         for m in modules:
-            for lang in langs:
-                for mode in modes:
-                    res_list.append(Renderer(lang, mode, seed).render([m], tmp / lang / mode / f"{m.id}.pdf"))
+            for skin in skins:
+                for lang in langs:
+                    for mode in modes:
+                        res_list.append(Renderer(lang, mode, seed, skin=skin).render(
+                            [m], tmp / lang / skin / mode / f"{m.id}.pdf"))
     else:
         res_list = list(results)
     assets = AssetResolver()
+    baseline = load_baseline()
     for res in res_list:
-        check_result(rep, res, assets)
+        check_result(rep, res, assets, baseline)
     if tmp is not None:
         shutil.rmtree(tmp, ignore_errors=True)
     # saring temuan global i18n agar hanya yang relevan dengan modul terpilih + _global

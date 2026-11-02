@@ -77,6 +77,7 @@ class AssetResolver:
         self.images_dir = Path(images_dir or config.IMAGES_DIR)
         self.cache_dir = Path(cache_dir or config.CACHE_DIR) / "bw"
         self.auto_placeholder = auto_placeholder
+        self.skins_dir = Path(config.SKINS_DIR)
 
     def source_path(self, image_id: str) -> Path:
         """Path PNG asli; membuat placeholder jika belum ada (kecuali dimatikan)."""
@@ -94,12 +95,17 @@ class AssetResolver:
         src = self.source_path(image_id)
         if mode != "bw":
             return src
-        st = src.stat()
-        key = f"{src.resolve()}|{st.st_mtime_ns}|{st.st_size}|{config.BW_CONTRAST}|{config.BW_BRIGHTNESS}"
-        out = self.cache_dir / f"{image_id}_{hashlib.sha1(key.encode()).hexdigest()[:10]}.png"
+        out = self.cache_dir / f"{image_id}_{self._bw_key(src)}.png"
         if not out.is_file():
             self._to_bw(src, out)
         return out
+
+    @staticmethod
+    def _bw_key(src: Path) -> str:
+        """Kunci cache bw dari ISI file + parameter (bukan mtime/path) agar PDF deterministik di semua mesin."""
+        h = hashlib.sha1(src.read_bytes())
+        h.update(f"{config.BW_CONTRAST}|{config.BW_BRIGHTNESS}".encode())
+        return h.hexdigest()[:10]
 
     @staticmethod
     def _to_bw(src: Path, out: Path) -> None:
@@ -110,6 +116,37 @@ class AssetResolver:
         gray = ImageEnhance.Brightness(gray).enhance(config.BW_BRIGHTNESS)
         out.parent.mkdir(parents=True, exist_ok=True)
         Image.merge("RGBA", (gray, gray, gray, alpha)).save(out)
+
+    # ---- gambar dekorasi skin: assets/skins/<skin>/<id>.png ---------------------
+    def skin_source(self, skin: str, image_id: str) -> Path:
+        """PNG dekorasi skin; placeholder otomatis jika belum ada."""
+        if not SLUG_RE.match(skin or "") or not SLUG_RE.match(image_id or ""):
+            raise AssetError(f"Nama skin/gambar tidak valid: {skin!r}/{image_id!r}")
+        p = self.skins_dir / skin / f"{image_id}.png"
+        if not p.is_file():
+            if not self.auto_placeholder:
+                raise AssetError(f"Gambar skin tidak ditemukan: {p}")
+            make_placeholder(p, image_id)
+        return p
+
+    def skin_path(self, skin: str, image_id: str, mode: str) -> Path:
+        """Path PNG dekorasi untuk mode tertentu (bw = grayscale kontras tinggi, cache)."""
+        src = self.skin_source(skin, image_id)
+        if mode != "bw":
+            return src
+        out = self.cache_dir / f"skin_{skin}_{image_id}_{self._bw_key(src)}.png"
+        if not out.is_file():
+            self._to_bw(src, out)
+        return out
+
+    def skin_info(self, skin: str, image_id: str) -> ImageInfo:
+        try:
+            p = self.skin_source(skin, image_id)
+        except AssetError:
+            return ImageInfo(image_id, self.skins_dir / skin / f"{image_id}.png", False)
+        with Image.open(p) as im:
+            alpha = im.mode in ("RGBA", "LA") or (im.mode == "P" and "transparency" in im.info)
+            return ImageInfo(image_id, p, True, im.info.get(PLACEHOLDER_TAG) == "1", im.width, im.height, alpha)
 
     def info(self, image_id: str) -> ImageInfo:
         """Metadata gambar untuk QC."""

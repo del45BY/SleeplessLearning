@@ -85,3 +85,18 @@ STRINGS.update({
     "vertical_lines.instruction.cloud_draw": 'Gambar hujannya. Tarik dari lingkaran ke lingkaran.',
     "vertical_lines.instruction.icicle": 'Gambar es yang menggantung. Tarik dari atas ke bawah.',
 })
+
+# --- horizontal_lines ---
+STRINGS.update({
+    "horizontal_lines.title": 'Garis Datar',
+    "horizontal_lines.instruction.road": 'Tebalkan jalan dari mobil ke rumah.',
+    "horizontal_lines.instruction.train": 'Tebalkan rel dari kereta ke stasiun.',
+    "horizontal_lines.instruction.bridge": 'Tebalkan jembatan dari kiri ke kanan.',
+    "horizontal_lines.instruction.clothesline": 'Tebalkan tali jemuran dari tiang ke tiang.',
+    "horizontal_lines.instruction.river": 'Tebalkan sungai dari perahu ke pulau.',
+    "horizontal_lines.instruction.caterpillar": 'Tebalkan jalan ke daun.',
+    "horizontal_lines.instruction.wire": 'Tebalkan kawat dari burung ke sarang.',
+    "horizontal_lines.instruction.airplane": 'Tebalkan jalur dari pesawat ke awan.',
+    "horizontal_lines.instruction.snail": 'Gambar jalan ke daun, dari lingkaran ke lingkaran.',
+    "horizontal_lines.instruction.ant": 'Gambar jalan ke kue, dari lingkaran ke lingkaran.',
+})

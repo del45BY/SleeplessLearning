@@ -85,3 +85,18 @@ STRINGS.update({
     "vertical_lines.instruction.cloud_draw": 'Dibuja la lluvia. Ve de círculo en círculo.',
     "vertical_lines.instruction.icicle": 'Dibuja los carámbanos. Ve de arriba hacia abajo.',
 })
+
+# --- horizontal_lines ---
+STRINGS.update({
+    "horizontal_lines.title": 'Líneas horizontales',
+    "horizontal_lines.instruction.road": 'Repasa el camino del auto a la casa.',
+    "horizontal_lines.instruction.train": 'Repasa las vías del tren a la estación.',
+    "horizontal_lines.instruction.bridge": 'Repasa el puente de izquierda a derecha.',
+    "horizontal_lines.instruction.clothesline": 'Repasa la cuerda de la ropa de poste a poste.',
+    "horizontal_lines.instruction.river": 'Repasa el río del bote a la isla.',
+    "horizontal_lines.instruction.caterpillar": 'Repasa el camino hasta la hoja.',
+    "horizontal_lines.instruction.wire": 'Repasa el cable del pájaro al nido.',
+    "horizontal_lines.instruction.airplane": 'Repasa el vuelo del avión a la nube.',
+    "horizontal_lines.instruction.snail": 'Dibuja el camino a la hoja, de círculo en círculo.',
+    "horizontal_lines.instruction.ant": 'Dibuja el camino a la galleta, de círculo en círculo.',
+})

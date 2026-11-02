@@ -46,10 +46,12 @@ def default_name(ids: Sequence[str]) -> str:
 
 def build_bundle(module_ids: Sequence[str], lang: str, mode: str, *, name: Optional[str] = None,
                  title: Optional[str] = None, cover: bool = True, toc: bool = True,
-                 seed: Optional[int] = None, out_dir: Optional[Path] = None) -> RenderResult:
-    """Render beberapa modul menjadi 1 PDF: output/{lang}/{mode}/bundle_<name>.pdf."""
+                 seed: Optional[int] = None, out_dir: Optional[Path] = None,
+                 skin: str = config.DEFAULT_SKIN) -> RenderResult:
+    """Render beberapa modul menjadi 1 PDF: output/{lang}/{skin}/{mode}/bundle_<name>.pdf."""
     mods: List[BaseModule] = [registry.get_module(i) for i in module_ids]
     name = name or default_name(list(module_ids))
-    path = Path(out_dir or config.OUTPUT_DIR) / lang / mode / f"bundle_{name}.pdf"
-    r = Renderer(lang, mode, seed)
-    return r.render(mods, path, scope=f"bundle:{name}", front=FrontMatter(title, cover, toc))
+    path = Path(out_dir or config.OUTPUT_DIR) / lang / skin / mode / f"bundle_{name}.pdf"
+    scope = f"bundle:{name}" + ("" if skin == config.DEFAULT_SKIN else f"@{skin}")
+    r = Renderer(lang, mode, seed, skin=skin)
+    return r.render(mods, path, scope=scope, front=FrontMatter(title, cover, toc))

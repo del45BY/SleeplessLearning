@@ -85,3 +85,18 @@ STRINGS.update({
     "vertical_lines.instruction.cloud_draw": 'Draw the rain. Go from circle to circle.',
     "vertical_lines.instruction.icicle": 'Draw the icicles. Go from top to bottom.',
 })
+
+# --- horizontal_lines ---
+STRINGS.update({
+    "horizontal_lines.title": 'Horizontal Lines',
+    "horizontal_lines.instruction.road": 'Trace the road from the car to the house.',
+    "horizontal_lines.instruction.train": 'Trace the track from the train to the station.',
+    "horizontal_lines.instruction.bridge": 'Trace the bridge from left to right.',
+    "horizontal_lines.instruction.clothesline": 'Trace the clothesline from pole to pole.',
+    "horizontal_lines.instruction.river": 'Trace the river from the boat to the island.',
+    "horizontal_lines.instruction.caterpillar": 'Trace the path to the leaf.',
+    "horizontal_lines.instruction.wire": 'Trace the wire from the bird to the nest.',
+    "horizontal_lines.instruction.airplane": 'Trace the flight from the plane to the cloud.',
+    "horizontal_lines.instruction.snail": 'Draw the path to the leaf, circle to circle.',
+    "horizontal_lines.instruction.ant": 'Draw the path to the cookie, circle to circle.',
+})

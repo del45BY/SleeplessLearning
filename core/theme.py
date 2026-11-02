@@ -20,6 +20,21 @@ BW_PALETTE: Mapping[str, float] = {
     "paper": 1.0, "ink": 0.0, "muted": 0.30, "line": 0.40, "guide": 0.45,
     "guide_soft": 0.55, "trace": 0.35, "accent": 0.0, "accent_soft": 1.0,
     "model_fill": 1.0,
+    "decor_1": 0.40, "decor_2": 0.50, "decor_soft": 0.85, "ribbon_fill": 1.0, "box_fill": 1.0,
+}
+
+# Palet per skin. SATU-SATUNYA tempat warna skin didefinisikan (skin tidak boleh punya hex sendiri).
+# Hanya nama warna yang sudah ada yang boleh ditimpa. "classic" tidak menimpa apa pun.
+SKIN_COLORS: Mapping[str, Mapping[str, str]] = {
+    "garden": {"accent": "#2E7D32", "accent_soft": "#E8F5E9", "decor_1": "#43A047", "decor_2": "#F9A825",
+               "decor_soft": "#CDE8C5", "ribbon_fill": "#E3F4D7", "box_fill": "#F4FAEF"},
+    "space": {"accent": "#3F2B96", "accent_soft": "#ECE8FA", "decor_1": "#5B47C9", "decor_2": "#F2A900",
+              "decor_soft": "#CFC8F2", "ribbon_fill": "#E9E5FA", "box_fill": "#F3F0FC"},
+}
+# Versi bw: hanya abu-abu; fill besar selalu 1.0 (putih), aksen berupa garis (outline).
+SKIN_BW: Mapping[str, Mapping[str, float]] = {
+    "garden": {"decor_1": 0.40, "decor_2": 0.50},
+    "space": {"decor_1": 0.40, "decor_2": 0.50},
 }
 
 
@@ -50,6 +65,7 @@ class Theme:
     mode: str
     palette: Mapping[str, RGB]
     line_scale: float = 1.0
+    skin: str = "classic"
 
     @property
     def is_bw(self) -> bool:
@@ -66,10 +82,20 @@ class Theme:
 
 
 @lru_cache(maxsize=None)
-def get_theme(mode: str) -> Theme:
-    """Ambil tema untuk mode 'color' atau 'bw'."""
+def get_theme(mode: str, skin: str = "classic") -> Theme:
+    """Ambil tema untuk mode 'color' | 'bw' dan skin tertentu (default classic = palet lama)."""
     if mode == "color":
-        return Theme("color", {k: _hex_to_rgb(v) for k, v in config.BRAND_COLORS.items()})
+        pal = {k: _hex_to_rgb(v) for k, v in config.BRAND_COLORS.items()}
+        for k, v in SKIN_COLORS.get(skin, {}).items():
+            if k not in pal:
+                raise KeyError(f"Skin '{skin}' menimpa warna yang tidak ada: {k}")
+            pal[k] = _hex_to_rgb(v)
+        return Theme("color", pal, 1.0, skin)
     if mode == "bw":
-        return Theme("bw", {k: (v, v, v) for k, v in BW_PALETTE.items()}, config.BW_LINE_SCALE)
+        pal = {k: (v, v, v) for k, v in BW_PALETTE.items()}
+        for k, v in SKIN_BW.get(skin, {}).items():
+            if k not in pal:
+                raise KeyError(f"Skin '{skin}' menimpa warna bw yang tidak ada: {k}")
+            pal[k] = (v, v, v)
+        return Theme("bw", pal, config.BW_LINE_SCALE, skin)
     raise ValueError(f"Mode tidak dikenal: {mode!r} (pakai 'color' atau 'bw')")

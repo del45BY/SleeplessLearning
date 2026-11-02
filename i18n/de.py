@@ -85,3 +85,18 @@ STRINGS.update({
     "vertical_lines.instruction.cloud_draw": 'Zeichne den Regen. Gehe von Kreis zu Kreis.',
     "vertical_lines.instruction.icicle": 'Zeichne die Eiszapfen. Ziehe von oben nach unten.',
 })
+
+# --- horizontal_lines ---
+STRINGS.update({
+    "horizontal_lines.title": 'Waagerechte Linien',
+    "horizontal_lines.instruction.road": 'Fahre die Straße vom Auto zum Haus nach.',
+    "horizontal_lines.instruction.train": 'Fahre die Schienen vom Zug zum Bahnhof nach.',
+    "horizontal_lines.instruction.bridge": 'Fahre die Brücke von links nach rechts nach.',
+    "horizontal_lines.instruction.clothesline": 'Fahre die Wäscheleine von Pfosten zu Pfosten nach.',
+    "horizontal_lines.instruction.river": 'Fahre den Fluss vom Boot zur Insel nach.',
+    "horizontal_lines.instruction.caterpillar": 'Fahre den Weg zum Blatt nach.',
+    "horizontal_lines.instruction.wire": 'Fahre den Draht vom Vogel zum Nest nach.',
+    "horizontal_lines.instruction.airplane": 'Fahre den Flug vom Flugzeug zur Wolke nach.',
+    "horizontal_lines.instruction.snail": 'Zeichne den Weg zum Blatt, von Kreis zu Kreis.',
+    "horizontal_lines.instruction.ant": 'Zeichne den Weg zum Keks, von Kreis zu Kreis.',
+})

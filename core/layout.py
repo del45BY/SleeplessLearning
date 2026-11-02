@@ -8,9 +8,10 @@ QC bisa memeriksa tanpa membaca PDF.
 from __future__ import annotations
 
 import logging
+import math
 import random
 from dataclasses import dataclass, field
-from typing import List, Optional, Sequence, Set, Tuple
+from typing import TYPE_CHECKING, List, Optional, Sequence, Set, Tuple
 
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.pdfmetrics import stringWidth
@@ -21,7 +22,10 @@ import config
 from core import strokefont
 from core.assets import AssetResolver
 from core.i18n import Translator
-from core.theme import Theme
+from core.theme import Theme, relative_luminance
+
+if TYPE_CHECKING:  # pragma: no cover
+    from skins.base import BaseSkin
 
 log = logging.getLogger(__name__)
 MM = config.MM_TO_PT
@@ -145,6 +149,7 @@ class Element:
     image: str = ""
     group: str = ""
     value: str = ""
+    skin_image: str = ""            # id PNG dekorasi skin (zone == "decor")
 
 
 @dataclass
@@ -185,12 +190,17 @@ class Page:
       draw_trace_line(cell, text, ...)      baris tracing dengan garis panduan
       draw_writing_lines(cell, rows)        baris menulis kosong
       draw_vertical_line(cell, style)       garis tegak atas->bawah (dashed|dotted|points)
+      draw_horizontal_line(cell, style)     garis datar kiri->kanan (dashed|dotted|points)
       draw_box(rect, ...)                   kotak/bingkai (kontainer)
       draw_text(rect, text, ...)            teks 1 baris
     """
 
     def __init__(self, canvas: Canvas, theme: Theme, tr: Translator, assets: AssetResolver,
-                 spec: PageSpec, seed: Optional[int] = None) -> None:
+                 spec: PageSpec, seed: Optional[int] = None, skin: Optional["BaseSkin"] = None) -> None:
+        if skin is None:                      # tanpa skin = perilaku lama (classic)
+            from skins.classic import ClassicSkin
+            skin = ClassicSkin()
+        self.skin = skin                     # skin aktif; modul tidak perlu tahu
         self.c = canvas                      # internal: jangan dipakai modul
         self.theme, self.tr, self.assets, self.spec = theme, tr, assets, spec
         self.lang, self.mode = tr.lang, theme.mode
@@ -429,19 +439,62 @@ class Page:
             c.drawPath(path, stroke=1, fill=0)
         c.restoreState()
 
+    def draw_horizontal_line(self, cell: Rect, style: str = "dashed", *, group: str = "", value: str = "") -> None:
+        """Satu garis datar di tengah `cell`, dari kiri ke kanan (arah dasar menulis).
+
+        style: "dashed" | "dotted" | "points" (hanya lingkaran awal & akhir; anak menarik sendiri).
+        Awal = lingkaran (accent) di kiri, akhir = panah (atau lingkaran untuk "points") di kanan.
+        """
+        if style not in ("dashed", "dotted", "points"):
+            raise ValueError(f"style garis datar tidak dikenal: {style!r}")
+        R, A = config.VLINE_MARKER_R_MM, config.VLINE_ARROW_MM
+        half = max(R, A)
+        self._log(Element("hline", Rect(cell.x, cell.cy - half, cell.w, 2 * half), within=cell,
+                          group=group, value=value))
+        c, Y = self.c, self._y(cell.cy)
+        c.saveState()
+        c.setLineWidth(self._lw(config.LINE_THICK_PT))
+        self._stroke("accent")
+        self._fill("paper")
+        c.circle((cell.x + R) * MM, Y, R * MM, stroke=1, fill=1)
+        self._stroke("trace")
+        if style == "points":
+            c.circle((cell.right - R) * MM, Y, R * MM, stroke=1, fill=1)
+        else:
+            c.setLineCap(1)
+            c.setLineJoin(1)
+            if style == "dashed":
+                c.setLineWidth(self._lw(config.TRACE_CENTER_STROKE_PT))
+                c.setDash(list(config.TRACE_CENTER_DASH))
+            else:
+                c.setLineWidth(self._lw(config.VLINE_DOTTED_PT))
+                c.setDash(list(config.VLINE_DOTTED))
+            c.line((cell.x + 2 * R + 1.0) * MM, Y, (cell.right - A) * MM, Y)
+            c.setDash([])
+            c.setLineWidth(self._lw(config.LINE_THICK_PT))
+            path = c.beginPath()
+            path.moveTo((cell.right - A) * MM, Y + A * MM)
+            path.lineTo(cell.right * MM, Y)
+            path.lineTo((cell.right - A) * MM, Y - A * MM)
+            c.drawPath(path, stroke=1, fill=0)
+        c.restoreState()
+
     def draw_instruction(self, text: str, icon: str = "icon_pencil") -> None:
-        """Satu gaya instruksi: ikon kecil + kalimat pendek 1 baris (zona tetap)."""
+        """Satu gaya instruksi: ikon kecil + kalimat pendek 1 baris (zona tetap). Tampilan = hook skin."""
         if self.record.has_instruction:
             raise ValueError("draw_instruction hanya boleh dipanggil sekali per halaman.")
         self.record.has_instruction = True
-        z = Rect(config.MARGIN_MM, config.INSTR_TOP, SAFE_AREA.w, config.INSTR_H)
-        ic = Rect(z.x, z.y + (z.h - config.ICON_MM) / 2, config.ICON_MM, config.ICON_MM)
-        self._log(Element("icon", ic, "system", image=icon))
-        self.c.drawImage(str(self.assets.path(icon, self.mode)), ic.x * MM, self._y(ic.bottom),
-                         ic.w * MM, ic.h * MM, mask="auto", preserveAspectRatio=True, anchor="c")
-        gap = 3.0
-        tr = Rect(ic.right + gap, z.y, z.w - config.ICON_MM - gap, z.h)
-        self.draw_text(tr, text, size=config.FONT_INSTRUCTION, bold=True, zone="system", kind="instruction")
+        self.skin.draw_instruction_badge(self, text, icon)
+
+    def draw_section_title(self, rect: Rect, text: str, *, size: float = config.FONT_LABEL) -> None:
+        """Judul bagian (opsional untuk modul). Tampilan = hook skin; classic = teks tebal berwarna aksen."""
+        self.skin.draw_section_title(self, rect, text, size)
+
+    def _draw_icon(self, rect: Rect, icon: str) -> None:
+        """Ikon instruksi (dipakai hook badge)."""
+        self._log(Element("icon", rect, "system", image=icon))
+        self.c.drawImage(str(self.assets.path(icon, self.mode)), rect.x * MM, self._y(rect.bottom),
+                         rect.w * MM, rect.h * MM, mask="auto", preserveAspectRatio=True, anchor="c")
 
     # ---- chrome (header / identitas / footer) -------------------------------
     def _rule(self, y: float, color: str, width: float) -> None:
@@ -453,39 +506,170 @@ class Page:
         c.line(config.MARGIN_MM * MM, self._y(y), (config.MARGIN_MM + SAFE_AREA.w) * MM, self._y(y))
         c.restoreState()
 
+    # ---- zona tetap (dipakai skin; nilainya sama dengan perilaku lama) ----------
+    @property
+    def header_rect(self) -> Rect:
+        return Rect(config.MARGIN_MM, config.HEADER_TOP, SAFE_AREA.w, config.HEADER_H - 1.5)
+
+    @property
+    def ident_rect(self) -> Rect:
+        return Rect(config.MARGIN_MM, config.IDENT_TOP, SAFE_AREA.w, config.IDENT_H)
+
+    @property
+    def instr_zone(self) -> Rect:
+        return Rect(config.MARGIN_MM, config.INSTR_TOP, SAFE_AREA.w, config.INSTR_H)
+
+    @property
+    def footer_rect(self) -> Rect:
+        return Rect(config.MARGIN_MM, config.FOOTER_TOP + 1.0, SAFE_AREA.w, config.FOOTER_H - 1.0)
+
+    def _draw_hline(self, x1: float, x2: float, y: float, color: str, width: float) -> None:
+        """Garis horizontal sistem (mis. garis nama/tanggal). Tidak dicatat sebagai elemen."""
+        c = self.c
+        c.saveState()
+        self._stroke(color)
+        c.setLineWidth(self._lw(width))
+        c.line(x1 * MM, self._y(y), x2 * MM, self._y(y))
+        c.restoreState()
+
     def _draw_chrome(self) -> None:
-        k = self.spec.kind
+        """Urutan tetap; tampilan tiap bagian ditentukan hook skin aktif."""
+        k, s = self.spec.kind, self.skin
+        s.draw_page_background(self)
+        s.draw_page_frame(self)
+        s.draw_corner_decor(self)
         if k in ("module", "toc"):
-            hd = Rect(config.MARGIN_MM, config.HEADER_TOP, SAFE_AREA.w, config.HEADER_H - 1.5)
-            self.draw_text(self.cell(hd, 0, 9), self.spec.title, size=config.FONT_TITLE, bold=True,
-                           color="accent", zone="system", kind="header_title")
-            self.draw_text(self.cell(hd, 9, 3), self.spec.series_label, size=config.FONT_HEADER_SIDE,
-                           align="right", color="muted", zone="system", kind="header_side")
-            self._rule(config.HEADER_TOP + config.HEADER_H, "accent", config.LINE_THICK_PT)
+            s.draw_header(self)
         if k == "module":
-            ir = Rect(config.MARGIN_MM, config.IDENT_TOP, SAFE_AREA.w, config.IDENT_H)
-            for cell, key in ((self.cell(ir, 0, 8), "common.name_label"), (self.cell(ir, 8, 4), "common.date_label")):
-                label = self.t(key)
-                lab_rect = Rect(cell.x, cell.y, cell.w - config.MIN_WRITE_LINE_MM, cell.h)
-                self.draw_text(lab_rect, label, size=config.FONT_IDENT, bold=True, zone="system", kind="identity_label")
-                lw = text_width_mm(label, FONT_BOLD, config.FONT_IDENT)
-                c = self.c
-                c.saveState()
-                self._stroke("line")
-                c.setLineWidth(self._lw(config.LINE_NORMAL_PT))
-                y = self._y(cell.bottom - 1.0)
-                c.line((cell.x + lw + 2) * MM, y, (cell.right - 1) * MM, y)
-                c.restoreState()
-        # footer
-        self._rule(config.FOOTER_TOP, "line", config.LINE_THIN_PT)
-        fr = Rect(config.MARGIN_MM, config.FOOTER_TOP + 1.0, SAFE_AREA.w, config.FOOTER_H - 1.0)
-        self.draw_text(self.cell(fr, 0, 3), config.BRAND_NAME, size=config.FONT_FOOTER, bold=True,
-                       color="muted", zone="system", kind="footer_brand")
-        self.draw_text(self.cell(fr, 3, 7), self.t("common.license"), size=config.FONT_FOOTER,
-                       align="center", color="muted", zone="system", kind="footer_license")
-        self.draw_text(self.cell(fr, 10, 2), f"{self.t('common.page')} {self.spec.page_number}",
-                       size=config.FONT_FOOTER, bold=True, align="right", color="muted",
-                       zone="system", kind="footer_page")
+            s.draw_name_date_zone(self)
+        s.draw_footer(self)
+        if k == "module":
+            s.draw_reward_sticker_slot(self)
+
+    # ---- primitif dekorasi (HANYA untuk skin; geometri sederhana + PNG skin) -----
+    def _safe_fill(self, name: str) -> str:
+        """Mode bw: fill gelap otomatis diganti kertas putih (hemat tinta)."""
+        if self.theme.is_bw and relative_luminance(self.theme.rgb(name)) < 0.8:
+            return "paper"
+        return name
+
+    def margin_strips(self, outer: float, inner: float = 0.0) -> List[Rect]:
+        """4 strip margin (atas, bawah, kiri, kanan; tanpa tumpang tindih sudut) antara `outer` mm dari
+        tepi kertas dan `inner` mm sebelum safe area."""
+        W, H, M = config.PAGE_W_MM, config.PAGE_H_MM, config.MARGIN_MM
+        t, lo = M - inner - outer, M - inner
+        return [Rect(outer, outer, W - 2 * outer, t), Rect(outer, H - lo, W - 2 * outer, t),
+                Rect(outer, lo, t, H - 2 * lo), Rect(W - lo, lo, t, H - 2 * lo)]
+
+    def decor_rect(self, rect: Rect, *, color: str = "decor_1", fill: Optional[str] = None, radius: float = 0.0,
+                   line_w: float = config.LINE_NORMAL_PT, dashed: bool = False, container: bool = False,
+                   hollow: bool = False, zone: str = "decor", kind: str = "decor_box") -> None:
+        """Kotak (bersudut bulat). hollow=True dicatat sebagai 4 strip tepi (untuk bingkai)."""
+        if hollow:
+            t = 0.5
+            for r in (Rect(rect.x, rect.y, rect.w, t), Rect(rect.x, rect.bottom - t, rect.w, t),
+                      Rect(rect.x, rect.y, t, rect.h), Rect(rect.right - t, rect.y, t, rect.h)):
+                self._log(Element("decor_frame", r, zone))
+        else:
+            self._log(Element(kind, rect, zone, container=container))
+        c = self.c
+        c.saveState()
+        self._stroke(color)
+        c.setLineWidth(self._lw(line_w))
+        if dashed:
+            c.setDash(list(config.GUIDE_DASH))
+        if fill:
+            self._fill(self._safe_fill(fill))
+        c.roundRect(rect.x * MM, self._y(rect.bottom), rect.w * MM, rect.h * MM, radius * MM,
+                    stroke=1, fill=1 if fill else 0)
+        c.restoreState()
+
+    def decor_line(self, x1: float, y1: float, x2: float, y2: float, *, color: str = "decor_1",
+                   line_w: float = config.LINE_NORMAL_PT, dash: Optional[Sequence[float]] = None,
+                   round_cap: bool = False, zone: str = "decor") -> None:
+        """Garis lurus (mm). dash=(on, off) dalam pt; round_cap + dash kecil = titik-titik."""
+        pad = max(0.4, line_w * 0.3528)
+        self._log(Element("decor_line", Rect(min(x1, x2) - pad / 2, min(y1, y2) - pad / 2,
+                                              abs(x2 - x1) + pad, abs(y2 - y1) + pad), zone))
+        c = self.c
+        c.saveState()
+        self._stroke(color)
+        c.setLineWidth(self._lw(line_w))
+        if round_cap:
+            c.setLineCap(1)
+        if dash:
+            c.setDash(list(dash))
+        c.line(x1 * MM, self._y(y1), x2 * MM, self._y(y2))
+        c.restoreState()
+
+    def decor_circle(self, cx: float, cy: float, r: float, *, color: str = "decor_1", fill: Optional[str] = None,
+                     line_w: float = config.LINE_NORMAL_PT, dashed: bool = False, zone: str = "decor",
+                     kind: str = "decor_circle") -> None:
+        """Lingkaran (mm)."""
+        self._log(Element(kind, Rect(cx - r, cy - r, 2 * r, 2 * r), zone))
+        c = self.c
+        c.saveState()
+        self._stroke(color)
+        c.setLineWidth(self._lw(line_w))
+        if dashed:
+            c.setDash(list(config.GUIDE_DASH))
+        if fill:
+            self._fill(self._safe_fill(fill))
+        c.circle(cx * MM, self._y(cy), r * MM, stroke=1, fill=1 if fill else 0)
+        c.restoreState()
+
+    def decor_wave(self, rect: Rect, *, color: str = "decor_1", amp: float = 0.8, period: float = 8.0,
+                   line_w: float = config.LINE_NORMAL_PT, zone: str = "decor") -> None:
+        """Garis bergelombang sepanjang rect.w, berpusat di rect.cy."""
+        self._log(Element("decor_wave", Rect(rect.x, rect.cy - amp - 0.2, rect.w, 2 * amp + 0.4), zone))
+        c = self.c
+        c.saveState()
+        self._stroke(color)
+        c.setLineWidth(self._lw(line_w))
+        c.setLineJoin(1)
+        path = c.beginPath()
+        n = max(2, int(rect.w / 0.8))
+        for i in range(n + 1):
+            x = rect.x + rect.w * i / n
+            y = rect.cy + amp * math.sin(2 * math.pi * (x - rect.x) / period)
+            path.moveTo(x * MM, self._y(y)) if i == 0 else path.lineTo(x * MM, self._y(y))
+        c.drawPath(path, stroke=1, fill=0)
+        c.restoreState()
+
+    def decor_dots(self, rect: Rect, *, step: float = config.SKIN_DOT_STEP_MM, r: float = config.SKIN_DOT_R_MM,
+                   color: str = "decor_soft", points: Optional[Sequence[Tuple[float, float, float]]] = None) -> None:
+        """Pola titik latar dalam rect (grid, atau `points` = [(x, y, r)] mutlak). Mode bw: DIHILANGKAN."""
+        if self.theme.is_bw:
+            return
+        self._log(Element("decor_dots", rect, "decor"))
+        c = self.c
+        c.saveState()
+        self._fill(color)
+        if points is not None:
+            for x, y, rr in points:
+                c.circle(x * MM, self._y(y), rr * MM, stroke=0, fill=1)
+        else:
+            nx, ny = max(1, int(rect.w // step)), max(1, int(rect.h // step))
+            for i in range(nx):
+                for j in range(ny):
+                    c.circle((rect.x + (i + 0.5) * rect.w / nx) * MM, self._y(rect.y + (j + 0.5) * rect.h / ny),
+                             r * MM, stroke=0, fill=1)
+        c.restoreState()
+
+    def decor_image(self, rect: Rect, image_id: str, *, mirror_x: bool = False, mirror_y: bool = False,
+                    rotate: int = 0, container: bool = False) -> None:
+        """PNG dekorasi dari assets/skins/<skin>/<id>.png (placeholder otomatis), bisa dicerminkan/diputar."""
+        self._log(Element("decor_image", rect, "decor", container=container, skin_image=image_id))
+        path = self.assets.skin_path(self.skin.name, image_id, self.mode)
+        c = self.c
+        c.saveState()
+        c.translate(rect.cx * MM, self._y(rect.cy))
+        if rotate:
+            c.rotate(-rotate)
+        c.scale(-1 if mirror_x else 1, -1 if mirror_y else 1)
+        c.drawImage(str(path), -rect.w * MM / 2, -rect.h * MM / 2, rect.w * MM, rect.h * MM,
+                    mask="auto", preserveAspectRatio=True, anchor="c")
+        c.restoreState()
 
     def finish(self) -> PageRecord:
         """Akhiri halaman (dipanggil renderer)."""

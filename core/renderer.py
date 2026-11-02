@@ -11,6 +11,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen.canvas import Canvas
 
 import config
+from core import registry
 from core.assets import AssetResolver
 from core.i18n import I18nEvent, Translator
 from core.layout import Page, PageRecord, PageSpec, register_fonts
@@ -37,6 +38,7 @@ class RenderResult:
     path: Path
     modules: List[BaseModule]
     expected_pages: int
+    skin: str = "classic"
     records: List[PageRecord] = field(default_factory=list)
     i18n_events: List[I18nEvent] = field(default_factory=list)
     errors: List[str] = field(default_factory=list)
@@ -47,10 +49,11 @@ class Renderer:
     """Render satu atau beberapa modul ke satu PDF untuk (lang, mode)."""
 
     def __init__(self, lang: str, mode: str, seed: Optional[int] = None,
-                 assets: Optional[AssetResolver] = None) -> None:
+                 assets: Optional[AssetResolver] = None, skin: str = config.DEFAULT_SKIN) -> None:
         register_fonts()
         self.lang, self.mode, self.seed = lang, mode, seed
-        self.theme = get_theme(mode)
+        self.skin = registry.get_skin(skin)
+        self.theme = get_theme(mode, self.skin.name)
         self.assets = assets or AssetResolver()
 
     def render(self, modules: Sequence[BaseModule], out_path: Path, *, scope: Optional[str] = None,
@@ -71,8 +74,11 @@ class Renderer:
             plan += [("module", m, p) for p in range(m.pages)]
         total = len(plan)
 
-        res = RenderResult(scope or (modules[0].id if len(modules) == 1 else "bundle"), self.lang, self.mode,
-                           out_path, list(modules), total)
+        default_scope = modules[0].id if len(modules) == 1 else "bundle"
+        if scope is None and self.skin.name != config.DEFAULT_SKIN:
+            default_scope += f"@{self.skin.name}"
+        res = RenderResult(scope or default_scope, self.lang, self.mode, out_path, list(modules), total,
+                           self.skin.name)
         if front and front.cover:
             res.extra_images.add("cover_art")
         c = Canvas(str(out_path), pagesize=letter, invariant=1, pageCompression=1,
@@ -80,7 +86,7 @@ class Renderer:
         c.setAuthor(config.BRAND_NAME)
         c.setTitle(front.title if front and front.title else tr.t(modules[0].title_key) if len(modules) == 1
                    else tr.t("bundle.default_title"))
-        c.setSubject(f"{self.lang}/{self.mode}")
+        c.setSubject(f"{self.lang}/{self.mode}" + ("" if self.skin.name == config.DEFAULT_SKIN else f"/{self.skin.name}"))
 
         for n, (kind, m, idx) in enumerate(plan, start=1):
             if kind == "module":
@@ -90,7 +96,7 @@ class Renderer:
                 spec = PageSpec("toc", tr.t("bundle.toc_title"), "", n, total)
             else:
                 spec = PageSpec("cover", "", "", n, total)
-            page = Page(c, self.theme, tr, self.assets, spec, self.seed)
+            page = Page(c, self.theme, tr, self.assets, spec, self.seed, self.skin)
             try:
                 if kind == "module":
                     if idx == 0:

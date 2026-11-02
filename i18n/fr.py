@@ -85,3 +85,18 @@ STRINGS.update({
     "vertical_lines.instruction.cloud_draw": 'Dessine la pluie. Va de rond en rond.',
     "vertical_lines.instruction.icicle": 'Dessine les glaçons. Va de haut en bas.',
 })
+
+# --- horizontal_lines ---
+STRINGS.update({
+    "horizontal_lines.title": 'Lignes horizontales',
+    "horizontal_lines.instruction.road": 'Repasse la route de la voiture à la maison.',
+    "horizontal_lines.instruction.train": 'Repasse les rails du train à la gare.',
+    "horizontal_lines.instruction.bridge": 'Repasse le pont de gauche à droite.',
+    "horizontal_lines.instruction.clothesline": 'Repasse le fil à linge de poteau en poteau.',
+    "horizontal_lines.instruction.river": "Repasse la rivière du bateau à l'île.",
+    "horizontal_lines.instruction.caterpillar": "Repasse le chemin jusqu'à la feuille.",
+    "horizontal_lines.instruction.wire": "Repasse le fil de l'oiseau au nid.",
+    "horizontal_lines.instruction.airplane": "Repasse le vol de l'avion au nuage.",
+    "horizontal_lines.instruction.snail": "Dessine le chemin jusqu'à la feuille, de rond en rond.",
+    "horizontal_lines.instruction.ant": "Dessine le chemin jusqu'au biscuit, de rond en rond.",
+})

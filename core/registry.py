@@ -13,6 +13,7 @@ from typing import Dict, List, Optional
 import config
 from core.i18n import lookup
 from modules.base import BaseModule
+from skins.base import BaseSkin
 
 log = logging.getLogger(__name__)
 _REGISTRY: Optional[Dict[str, BaseModule]] = None
@@ -128,3 +129,68 @@ def sync_log(modules: List[BaseModule]) -> List[str]:
     if added:
         path.write_text(text, encoding="utf-8")
     return added
+
+
+# ---------------------------------------------------------------------------
+# Skin (auto-discover dari skins/*.py, kecuali base dan yang diawali '_')
+# ---------------------------------------------------------------------------
+_SKINS: Optional[Dict[str, BaseSkin]] = None
+_SKIN_ERRORS: List[str] = []
+
+
+def discover_skins(reload: bool = False) -> Dict[str, BaseSkin]:
+    """Impor semua skins/*.py dan daftarkan subclass BaseSkin yang lengkap."""
+    global _SKINS
+    if _SKINS is not None and not reload:
+        return _SKINS
+    import skins as pkg
+    reg: Dict[str, BaseSkin] = {}
+    _SKIN_ERRORS.clear()
+    for info in sorted(pkgutil.iter_modules(pkg.__path__), key=lambda i: i.name):
+        if info.name.startswith("_") or info.name == "base":
+            continue
+        try:
+            mod = importlib.import_module(f"skins.{info.name}")
+            if reload:
+                mod = importlib.reload(mod)
+        except Exception as exc:
+            _SKIN_ERRORS.append(f"skins/{info.name}.py gagal diimpor: {exc!r}")
+            continue
+        found = [c for _, c in inspect.getmembers(mod, inspect.isclass)
+                 if issubclass(c, BaseSkin) and c is not BaseSkin and c.__module__ == mod.__name__
+                 and not inspect.isabstract(c)]
+        if not found:
+            _SKIN_ERRORS.append(f"skins/{info.name}.py tidak berisi subclass BaseSkin yang lengkap")
+        for cls in found:
+            inst = cls()
+            name = getattr(inst, "name", "")
+            if not ID_RE.match(name or ""):
+                _SKIN_ERRORS.append(f"{cls.__name__}: name '{name}' harus snake_case huruf kecil")
+            elif name != info.name:
+                _SKIN_ERRORS.append(f"{cls.__name__}: name '{name}' harus sama dengan nama file '{info.name}'")
+            elif name in reg:
+                _SKIN_ERRORS.append(f"nama skin ganda '{name}'")
+            else:
+                reg[name] = inst
+    if config.DEFAULT_SKIN not in reg:
+        _SKIN_ERRORS.append(f"skin default '{config.DEFAULT_SKIN}' tidak ditemukan di skins/")
+    _SKINS = reg
+    return reg
+
+
+def skin_errors() -> List[str]:
+    discover_skins()
+    return list(_SKIN_ERRORS)
+
+
+def all_skins() -> List[BaseSkin]:
+    return [s for _, s in sorted(discover_skins().items())]
+
+
+def get_skin(name: str) -> BaseSkin:
+    reg = discover_skins()
+    if name not in reg:
+        hint = difflib.get_close_matches(name, list(reg), n=3)
+        extra = f" Maksud Anda: {', '.join(hint)}?" if hint else ""
+        raise ModuleNotFound(f"Skin '{name}' tidak ditemukan.{extra} Jalankan `python main.py skins`.")
+    return reg[name]

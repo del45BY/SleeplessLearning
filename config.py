@@ -19,6 +19,8 @@ ROOT = Path(__file__).resolve().parent
 IMAGES_DIR = ROOT / "assets" / "images"
 CACHE_DIR = ROOT / ".cache"
 FONTS_DIR = ROOT / "fonts"
+SKINS_DIR = ROOT / "assets" / "skins"          # PNG dekorasi: assets/skins/<skin>/<id>.png
+BASELINE_FILE = ROOT / "baseline" / "classic_layout.json"
 OUTPUT_DIR = ROOT / "output"
 LOG_FILE = ROOT / "MODULES_LOG.md"
 
@@ -47,6 +49,12 @@ BRAND_COLORS = {
     "accent": "#2F6FDE",
     "accent_soft": "#E6EEFC",
     "model_fill": "#FFF1E6",
+    # nama warna dekorasi skin (nilai classic tidak dipakai; skin menimpa di core/theme.py)
+    "decor_1": "#2F6FDE",
+    "decor_2": "#E8590C",
+    "decor_soft": "#D6E2F8",
+    "ribbon_fill": "#E6EEFC",
+    "box_fill": "#F5F8FE",
 }
 
 # --------------------------------------------------------------------------
@@ -116,6 +124,7 @@ VLINE_DOTTED = (0.01, 4.6)
 VLINE_DOTTED_PT = 2.4
 VLINE_LENGTHS = {"S": 90.0, "M": 110.0, "L": 120.0}
 VLINE_IMG_PAD_MM = 4.0
+HLINE_ROW_GAP_MM = 8.0          # jarak antar baris garis datar (ctx.draw_horizontal_line)
 WRITE_ROW_H_MM = 14.0                              # tinggi baris menulis kosong
 
 # --------------------------------------------------------------------------
@@ -188,3 +197,21 @@ def _apply_yaml_overrides() -> None:
 
 
 _apply_yaml_overrides()
+
+
+# --------------------------------------------------------------------------
+# Skin (tema visual). Dekorasi HANYA di margin, header, footer, latar, sudut.
+# --------------------------------------------------------------------------
+DEFAULT_SKIN = "classic"
+SKIN_FRAME_INSET_MM = 7.0          # jarak bingkai dari tepi kertas (zona aman cetak printer rumahan >= 5 mm)
+SKIN_CORNER_MM = 8.0               # ukuran PNG sudut
+SKIN_TILE_MM = 4.0                 # ukuran PNG ubin di sepanjang bingkai
+SKIN_TILE_STEP_MM = 24.0           # jarak antar ubin
+SKIN_BADGE_MM = 10.0               # badge instruksi (= tinggi zona instruksi)
+SKIN_STICKER_MM = 7.5              # slot stiker/stempel hadiah di header kanan
+SKIN_HEADER_ICON_MM = 7.5          # PNG kecil di header (mis. planet)
+SKIN_DOT_STEP_MM = 3.5             # jarak titik latar
+SKIN_DOT_R_MM = 0.45
+SKIN_PRINT_SAFE_MM = 5.0           # QC: dekorasi lebih dekat dari ini ke tepi kertas -> WARN
+SKIN_PROGRESS_STEP_MM = 2.8
+SKIN_PROGRESS_R_MM = 0.9
