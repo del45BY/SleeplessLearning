@@ -18,6 +18,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen.canvas import Canvas
 
 import config
+from core import strokefont
 from core.assets import AssetResolver
 from core.i18n import Translator
 from core.theme import Theme
@@ -165,6 +166,7 @@ class PageRecord:
     elements: List[Element] = field(default_factory=list)
     colors: Set[Tuple[str, Tuple[float, float, float], str]] = field(default_factory=set)
     has_instruction: bool = False
+    warnings: List[str] = field(default_factory=list)
 
 
 # ----------------------------------------------------------------------------
@@ -182,6 +184,7 @@ class Page:
       draw_image_slot(cell, image_id, size) gambar PNG dalam slot token S/M/L/XL
       draw_trace_line(cell, text, ...)      baris tracing dengan garis panduan
       draw_writing_lines(cell, rows)        baris menulis kosong
+      draw_vertical_line(cell, style)       garis tegak atas->bawah (dashed|dotted|points)
       draw_box(rect, ...)                   kotak/bingkai (kontainer)
       draw_text(rect, text, ...)            teks 1 baris
     """
@@ -330,25 +333,101 @@ class Page:
         n = max(1, int((row.w + config.TRACE_GAP_MM) // pitch))
         if max_reps:
             n = min(n, max_reps)
+        use_stroke = config.TRACE_STYLE == "stroke"
+        if use_stroke and not all(strokefont.has_stroke_glyph(ch) for ch in text):
+            missing = sorted({ch for ch in text if not strokefont.has_stroke_glyph(ch)})
+            self.record.warnings.append(f"tracing '{text}': karakter {missing} tidak ada di stroke font, pakai outline")
+            use_stroke = False
         for i in range(n):
-            c.saveState()
+            x0 = row.x + i * pitch
             if i == 0 and model:
+                c.saveState()
                 self._fill("model_fill")
                 self._stroke("ink")
                 c.setLineWidth(self._lw(config.LINE_NORMAL_PT))
-                mode = 2
+                t = c.beginText()
+                t.setTextOrigin(x0 * MM, self._y(y_base))
+                t.setFont(FONT_TRACE, size)
+                t.setTextRenderMode(2)
+                t.textOut(text)
+                c.drawText(t)
+                c.restoreState()
+            elif use_stroke:
+                self._draw_center_strokes(text, x0, y_base, size)
             else:
+                c.saveState()
                 self._stroke("trace")
                 c.setLineWidth(self._lw(config.TRACE_STROKE_PT))
                 c.setDash(list(config.TRACE_DASH))
-                mode = 1
-            t = c.beginText()
-            t.setTextOrigin((row.x + i * pitch) * MM, self._y(y_base))
-            t.setFont(FONT_TRACE, size)
-            t.setTextRenderMode(mode)
-            t.textOut(text)
-            c.drawText(t)
-            c.restoreState()
+                t = c.beginText()
+                t.setTextOrigin(x0 * MM, self._y(y_base))
+                t.setFont(FONT_TRACE, size)
+                t.setTextRenderMode(1)
+                t.textOut(text)
+                c.drawText(t)
+                c.restoreState()
+
+    def _draw_center_strokes(self, text: str, x0: float, y_base: float, size: float) -> None:
+        """Satu garis putus di tengah tiap goresan huruf (stroke font), dipusatkan pada lebar font."""
+        unit = (config.TRACE_BASE - config.TRACE_TOP) * config.TRACE_ROW_H_MM   # tinggi kapital (mm)
+        c = self.c
+        c.saveState()
+        self._stroke("trace")
+        c.setLineWidth(self._lw(config.TRACE_CENTER_STROKE_PT))
+        c.setLineCap(1)
+        c.setLineJoin(1)
+        c.setDash(list(config.TRACE_CENTER_DASH))
+        for k, ch in enumerate(text):
+            w_ink, strokes = strokefont.GLYPHS[ch]
+            adv = text_width_mm(ch, FONT_TRACE, size)
+            gx = x0 + text_width_mm(text[:k], FONT_TRACE, size) + (adv - w_ink * unit) / 2
+            for pts in strokes:
+                p = c.beginPath()
+                for j, (px, py) in enumerate(pts):
+                    X, Y = (gx + px * unit) * MM, self._y(y_base) + py * unit * MM
+                    p.moveTo(X, Y) if j == 0 else p.lineTo(X, Y)
+                c.drawPath(p, stroke=1, fill=0)
+        c.restoreState()
+
+    def draw_vertical_line(self, cell: Rect, style: str = "dashed", *, group: str = "", value: str = "") -> None:
+        """Satu garis tegak di tengah `cell`, dari atas ke bawah.
+
+        style: "dashed" (garis putus), "dotted" (titik-titik), "points" (hanya lingkaran awal & akhir;
+        anak menarik sendiri). Awal = lingkaran (accent), akhir = panah (atau lingkaran untuk "points").
+        """
+        if style not in ("dashed", "dotted", "points"):
+            raise ValueError(f"style garis tegak tidak dikenal: {style!r}")
+        R, A = config.VLINE_MARKER_R_MM, config.VLINE_ARROW_MM
+        half = max(R, A)
+        self._log(Element("vline", Rect(cell.cx - half, cell.y, 2 * half, cell.h), within=cell,
+                          group=group, value=value))
+        c, X = self.c, cell.cx * MM
+        c.saveState()
+        c.setLineWidth(self._lw(config.LINE_THICK_PT))
+        self._stroke("accent")
+        self._fill("paper")
+        c.circle(X, self._y(cell.y + R), R * MM, stroke=1, fill=1)
+        self._stroke("trace")
+        if style == "points":
+            c.circle(X, self._y(cell.bottom - R), R * MM, stroke=1, fill=1)
+        else:
+            c.setLineCap(1)
+            c.setLineJoin(1)
+            if style == "dashed":
+                c.setLineWidth(self._lw(config.TRACE_CENTER_STROKE_PT))
+                c.setDash(list(config.TRACE_CENTER_DASH))
+            else:
+                c.setLineWidth(self._lw(config.VLINE_DOTTED_PT))
+                c.setDash(list(config.VLINE_DOTTED))
+            c.line(X, self._y(cell.y + 2 * R + 1.0), X, self._y(cell.bottom - A))
+            c.setDash([])
+            c.setLineWidth(self._lw(config.LINE_THICK_PT))
+            path = c.beginPath()
+            path.moveTo(X - A * MM, self._y(cell.bottom - A))
+            path.lineTo(X, self._y(cell.bottom))
+            path.lineTo(X + A * MM, self._y(cell.bottom - A))
+            c.drawPath(path, stroke=1, fill=0)
+        c.restoreState()
 
     def draw_instruction(self, text: str, icon: str = "icon_pencil") -> None:
         """Satu gaya instruksi: ikon kecil + kalimat pendek 1 baris (zona tetap)."""

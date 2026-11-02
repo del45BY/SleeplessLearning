@@ -70,3 +70,18 @@ STRINGS.update({
     "counting_1_10.num.9": 'neun',
     "counting_1_10.num.10": 'zehn',
 })
+
+# --- vertical_lines ---
+STRINGS.update({
+    "vertical_lines.title": 'Senkrechte Linien',
+    "vertical_lines.instruction.rain": 'Fahre den Regen von oben nach unten nach.',
+    "vertical_lines.instruction.balloon": 'Fahre die Ballonschnüre nach unten nach.',
+    "vertical_lines.instruction.candle": 'Fahre jede Kerze von oben nach unten nach.',
+    "vertical_lines.instruction.fence": 'Fahre die Zaunlatten nach unten nach.',
+    "vertical_lines.instruction.flower": 'Fahre die Blumenstiele nach unten nach.',
+    "vertical_lines.instruction.tree": 'Fahre die Baumstämme nach unten nach.',
+    "vertical_lines.instruction.lollipop": 'Fahre die Lutscherstiele nach unten nach.',
+    "vertical_lines.instruction.lamp": 'Fahre die Laternenpfähle nach unten nach.',
+    "vertical_lines.instruction.cloud_draw": 'Zeichne den Regen. Gehe von Kreis zu Kreis.',
+    "vertical_lines.instruction.icicle": 'Zeichne die Eiszapfen. Ziehe von oben nach unten.',
+})

@@ -1,0 +1,76 @@
+{
+  "summary": {
+    "scopes": 2,
+    "fail": 0,
+    "warn": 2
+  },
+  "scopes": {
+    "_global": {
+      "status": "PASS",
+      "areas": {
+        "i18n": {
+          "status": "PASS",
+          "findings": []
+        },
+        "layout": {
+          "status": "PASS",
+          "findings": []
+        },
+        "images": {
+          "status": "PASS",
+          "findings": []
+        },
+        "pdf": {
+          "status": "PASS",
+          "findings": []
+        },
+        "mode": {
+          "status": "PASS",
+          "findings": []
+        },
+        "content": {
+          "status": "PASS",
+          "findings": []
+        }
+      }
+    },
+    "vertical_lines": {
+      "status": "WARN",
+      "areas": {
+        "i18n": {
+          "status": "PASS",
+          "findings": []
+        },
+        "layout": {
+          "status": "PASS",
+          "findings": []
+        },
+        "images": {
+          "status": "WARN",
+          "findings": [
+            {
+              "level": "WARN",
+              "message": "12 gambar masih placeholder: balloon, cloud, cupcake, flame, flower_head, grass_tuft, … (+6)",
+              "context": [
+                "en/bw",
+                "en/color"
+              ]
+            }
+          ]
+        },
+        "pdf": {
+          "status": "PASS",
+          "findings": []
+        },
+        "mode": {
+          "status": "PASS",
+          "findings": []
+        },
+        "content": {
+          "status": "PASS",
+          "findings": []
+        }
+      }
+    }
+  }
+}

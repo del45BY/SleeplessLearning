@@ -34,6 +34,13 @@ Semua gambar = PNG di `assets/images/<id>.png` (ikon juga: `icon_pencil.png`). J
 otomatis (kotak abu-abu + nama objek, ditandai di metadata PNG) dan QC melapor WARN. Timpa saja dengan PNG asli
 (disarankan RGBA, sisi terpendek ≥ 300 px). Versi bw dibuat otomatis (grayscale + kontras) dan di-cache di `.cache/bw/`.
 
+## Tracing: satu garis putus di tengah goresan
+Baris tracing (`ctx.draw_trace_line`, juga untuk kata utuh) memakai stroke font garis-tengah di `core/strokefont.py`
+(A–Z, a–z, 0–9). Huruf contoh pertama tetap outline tebal; pengulangan berikutnya = SATU garis putus di tengah goresan.
+Atur lewat `config.py`: `TRACE_STYLE` (`"stroke"` | `"outline"` = cara lama), `TRACE_CENTER_STROKE_PT`, `TRACE_CENTER_DASH`.
+Karakter di luar set (mis. é, ñ) otomatis memakai outline untuk baris itu dan QC memberi WARN.
+Jika memakai font tracing sendiri (`fonts/Trace.ttf`), sesuaikan bentuk di `strokefont.py` atau pakai `"outline"`.
+
 ## Struktur
 `config.py` token desain · `core/layout.py` satu-satunya sistem layout · `core/theme.py` semua warna ·
 `core/qc.py` QC · `modules/` satu file per modul · `i18n/<lang>.py` semua teks · `MODULES_LOG.md` otomatis.

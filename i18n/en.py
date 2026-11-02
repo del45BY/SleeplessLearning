@@ -70,3 +70,18 @@ STRINGS.update({
     "counting_1_10.num.9": 'nine',
     "counting_1_10.num.10": 'ten',
 })
+
+# --- vertical_lines ---
+STRINGS.update({
+    "vertical_lines.title": 'Vertical Lines',
+    "vertical_lines.instruction.rain": 'Trace the rain from top to bottom.',
+    "vertical_lines.instruction.balloon": 'Trace the balloon strings down.',
+    "vertical_lines.instruction.candle": 'Trace each candle from top to bottom.',
+    "vertical_lines.instruction.fence": 'Trace the fence posts down.',
+    "vertical_lines.instruction.flower": 'Trace the flower stems down.',
+    "vertical_lines.instruction.tree": 'Trace the tree trunks down.',
+    "vertical_lines.instruction.lollipop": 'Trace the lollipop sticks down.',
+    "vertical_lines.instruction.lamp": 'Trace the lamp posts down.',
+    "vertical_lines.instruction.cloud_draw": 'Draw the rain. Go from circle to circle.',
+    "vertical_lines.instruction.icicle": 'Draw the icicles. Go from top to bottom.',
+})

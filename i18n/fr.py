@@ -70,3 +70,18 @@ STRINGS.update({
     "counting_1_10.num.9": 'neuf',
     "counting_1_10.num.10": 'dix',
 })
+
+# --- vertical_lines ---
+STRINGS.update({
+    "vertical_lines.title": 'Lignes verticales',
+    "vertical_lines.instruction.rain": 'Repasse la pluie de haut en bas.',
+    "vertical_lines.instruction.balloon": 'Repasse les ficelles des ballons vers le bas.',
+    "vertical_lines.instruction.candle": 'Repasse chaque bougie de haut en bas.',
+    "vertical_lines.instruction.fence": 'Repasse les piquets de la barrière vers le bas.',
+    "vertical_lines.instruction.flower": 'Repasse les tiges des fleurs vers le bas.',
+    "vertical_lines.instruction.tree": 'Repasse les troncs des arbres vers le bas.',
+    "vertical_lines.instruction.lollipop": 'Repasse les bâtons des sucettes vers le bas.',
+    "vertical_lines.instruction.lamp": 'Repasse les lampadaires vers le bas.',
+    "vertical_lines.instruction.cloud_draw": 'Dessine la pluie. Va de rond en rond.',
+    "vertical_lines.instruction.icicle": 'Dessine les glaçons. Va de haut en bas.',
+})

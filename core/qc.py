@@ -222,6 +222,8 @@ def _check_layout(rep: QCReport, res: RenderResult) -> None:
                     continue
                 rep.add("FAIL", "layout", S, f"hal.{pg}: {a.kind} saling menimpa {b.kind} "
                         f"({a.text or a.image} / {b.text or b.image})", *ctx)
+        for w in rec.warnings:
+            rep.add("WARN", "layout", S, f"hal.{pg}: {w}", *ctx)
         if rec.spec.kind == "module":
             if not rec.has_instruction:
                 rep.add("FAIL", "layout", S, f"hal.{pg}: tidak ada draw_instruction()", *ctx)

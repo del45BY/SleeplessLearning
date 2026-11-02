@@ -25,7 +25,7 @@ LOG_FILE = ROOT / "MODULES_LOG.md"
 # --------------------------------------------------------------------------
 # Brand, bahasa, mode
 # --------------------------------------------------------------------------
-BRAND_NAME = "Sleepless Learning"
+BRAND_NAME = "Tiny Steps Studio"
 LANGS = ("en", "id", "es", "de", "fr", "pt")
 DEFAULT_LANG = "en"
 FALLBACK_LANG = "en"
@@ -104,6 +104,18 @@ TRACE_CAP_RATIO = 0.729                            # cap-height font trace / em 
 TRACE_GAP_MM = 6.0
 # ukuran font tracing diturunkan dari tinggi baris supaya huruf pas di antara garis
 TRACE_FONT_PT = (TRACE_BASE - TRACE_TOP) * TRACE_ROW_H_MM / TRACE_CAP_RATIO * MM_TO_PT
+# Gaya garis putus pada tracing: "stroke" = SATU garis putus di tengah goresan (core/strokefont.py);
+# "outline" = garis putus mengikuti tepi huruf (cara lama). Karakter di luar A-Z, a-z, 0-9 otomatis outline.
+TRACE_STYLE = "stroke"
+TRACE_CENTER_STROKE_PT = 1.6
+TRACE_CENTER_DASH = (2.6, 3.6)
+# Garis tegak (ctx.draw_vertical_line): penanda awal/akhir, pola titik, panjang garis baku
+VLINE_MARKER_R_MM = 2.2
+VLINE_ARROW_MM = 3.2
+VLINE_DOTTED = (0.01, 4.6)
+VLINE_DOTTED_PT = 2.4
+VLINE_LENGTHS = {"S": 90.0, "M": 110.0, "L": 120.0}
+VLINE_IMG_PAD_MM = 4.0
 WRITE_ROW_H_MM = 14.0                              # tinggi baris menulis kosong
 
 # --------------------------------------------------------------------------

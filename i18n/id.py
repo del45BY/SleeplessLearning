@@ -70,3 +70,18 @@ STRINGS.update({
     "counting_1_10.num.9": 'sembilan',
     "counting_1_10.num.10": 'sepuluh',
 })
+
+# --- vertical_lines ---
+STRINGS.update({
+    "vertical_lines.title": 'Garis Tegak',
+    "vertical_lines.instruction.rain": 'Tebalkan hujan dari atas ke bawah.',
+    "vertical_lines.instruction.balloon": 'Tebalkan tali balon ke bawah.',
+    "vertical_lines.instruction.candle": 'Tebalkan setiap lilin dari atas ke bawah.',
+    "vertical_lines.instruction.fence": 'Tebalkan tiang pagar ke bawah.',
+    "vertical_lines.instruction.flower": 'Tebalkan batang bunga ke bawah.',
+    "vertical_lines.instruction.tree": 'Tebalkan batang pohon ke bawah.',
+    "vertical_lines.instruction.lollipop": 'Tebalkan tangkai permen ke bawah.',
+    "vertical_lines.instruction.lamp": 'Tebalkan tiang lampu ke bawah.',
+    "vertical_lines.instruction.cloud_draw": 'Gambar hujannya. Tarik dari lingkaran ke lingkaran.',
+    "vertical_lines.instruction.icicle": 'Gambar es yang menggantung. Tarik dari atas ke bawah.',
+})

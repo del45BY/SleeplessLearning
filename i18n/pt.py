@@ -70,3 +70,18 @@ STRINGS.update({
     "counting_1_10.num.9": 'nove',
     "counting_1_10.num.10": 'dez',
 })
+
+# --- vertical_lines ---
+STRINGS.update({
+    "vertical_lines.title": 'Linhas verticais',
+    "vertical_lines.instruction.rain": 'Cubra a chuva de cima para baixo.',
+    "vertical_lines.instruction.balloon": 'Cubra os fios dos balões para baixo.',
+    "vertical_lines.instruction.candle": 'Cubra cada vela de cima para baixo.',
+    "vertical_lines.instruction.fence": 'Cubra as estacas da cerca para baixo.',
+    "vertical_lines.instruction.flower": 'Cubra os caules das flores para baixo.',
+    "vertical_lines.instruction.tree": 'Cubra os troncos das árvores para baixo.',
+    "vertical_lines.instruction.lollipop": 'Cubra os palitos dos pirulitos para baixo.',
+    "vertical_lines.instruction.lamp": 'Cubra os postes de luz para baixo.',
+    "vertical_lines.instruction.cloud_draw": 'Desenhe a chuva. Vá de círculo em círculo.',
+    "vertical_lines.instruction.icicle": 'Desenhe os pingentes de gelo. Vá de cima para baixo.',
+})
