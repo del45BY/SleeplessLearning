@@ -1,12 +1,11 @@
 # QC Report
 
-**FAIL: 2 · WARN: 3**
+**FAIL: 0 · WARN: 3**
 
 | Scope | Status | i18n | layout | images | pdf | mode | content |
 |---|---|---|---|---|---|---|---|
 | `_global` | **PASS** | PASS | PASS | PASS | PASS | PASS | PASS |
-| `vertical_lines` | **PASS** | PASS | PASS | PASS | PASS | PASS | PASS |
-| `vertical_lines@space` | **FAIL** | PASS | PASS | FAIL | WARN | PASS | PASS |
+| `vertical_lines` | **WARN** | PASS | PASS | WARN | WARN | PASS | PASS |
 
 ## `_global` — PASS
 - **i18n**: PASS
@@ -16,21 +15,12 @@
 - **mode**: PASS
 - **content**: PASS
 
-## `vertical_lines` — PASS
+## `vertical_lines` — WARN
 - **i18n**: PASS
 - **layout**: PASS
-- **images**: PASS
-- **pdf**: PASS
-- **mode**: PASS
-- **content**: PASS
-
-## `vertical_lines@space` — FAIL
-- **i18n**: PASS
-- **layout**: PASS
-- **images**: FAIL
-  - [FAIL] 'icon_pencil.png' resolusi 96x96 terlalu kecil _(…id/bw, id/color)_
-  - [WARN] 10 gambar masih placeholder: balloon, cloud, cupcake, flame, flower_head, grass_tuft, … (+4) _(…id/bw, id/color)_
+- **images**: WARN
+  - [WARN] 7 gambar masih placeholder: cupcake, flame, grass_tuft, icicle, icon_pencil, lollipop, … (+1) _(…en/bw, en/color)_
 - **pdf**: WARN
-  - [WARN] Ukuran file 10.5 MB cukup besar _(…id/color)_
+  - [WARN] Ukuran file 9.2 MB cukup besar _(…en/color)_
 - **mode**: PASS
 - **content**: PASS

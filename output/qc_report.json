@@ -1,7 +1,7 @@
 {
   "summary": {
-    "scopes": 3,
-    "fail": 2,
+    "scopes": 2,
+    "fail": 0,
     "warn": 3
   },
   "scopes": {
@@ -35,7 +35,7 @@
       }
     },
     "vertical_lines": {
-      "status": "PASS",
+      "status": "WARN",
       "areas": {
         "i18n": {
           "status": "PASS",
@@ -46,51 +46,14 @@
           "findings": []
         },
         "images": {
-          "status": "PASS",
-          "findings": []
-        },
-        "pdf": {
-          "status": "PASS",
-          "findings": []
-        },
-        "mode": {
-          "status": "PASS",
-          "findings": []
-        },
-        "content": {
-          "status": "PASS",
-          "findings": []
-        }
-      }
-    },
-    "vertical_lines@space": {
-      "status": "FAIL",
-      "areas": {
-        "i18n": {
-          "status": "PASS",
-          "findings": []
-        },
-        "layout": {
-          "status": "PASS",
-          "findings": []
-        },
-        "images": {
-          "status": "FAIL",
+          "status": "WARN",
           "findings": [
             {
-              "level": "FAIL",
-              "message": "'icon_pencil.png' resolusi 96x96 terlalu kecil",
-              "context": [
-                "id/bw",
-                "id/color"
-              ]
-            },
-            {
               "level": "WARN",
-              "message": "10 gambar masih placeholder: balloon, cloud, cupcake, flame, flower_head, grass_tuft, … (+4)",
+              "message": "7 gambar masih placeholder: cupcake, flame, grass_tuft, icicle, icon_pencil, lollipop, … (+1)",
               "context": [
-                "id/bw",
-                "id/color"
+                "en/bw",
+                "en/color"
               ]
             }
           ]
@@ -100,9 +63,9 @@
           "findings": [
             {
               "level": "WARN",
-              "message": "Ukuran file 10.5 MB cukup besar",
+              "message": "Ukuran file 9.2 MB cukup besar",
               "context": [
-                "id/color"
+                "en/color"
               ]
             }
           ]
