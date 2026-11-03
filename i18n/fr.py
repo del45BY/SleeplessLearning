@@ -100,3 +100,18 @@ STRINGS.update({
     "horizontal_lines.instruction.snail": "Dessine le chemin jusqu'à la feuille, de rond en rond.",
     "horizontal_lines.instruction.ant": "Dessine le chemin jusqu'au biscuit, de rond en rond.",
 })
+
+# --- diagonal_lines ---
+STRINGS.update({
+    "diagonal_lines.title": 'Lignes obliques',
+    "diagonal_lines.instruction.slide": 'Repasse le toboggan de haut en bas.',
+    "diagonal_lines.instruction.ladder": "Repasse l'échelle de la fenêtre au sol.",
+    "diagonal_lines.instruction.kite_string": 'Repasse les ficelles des cerfs-volants vers le bas.',
+    "diagonal_lines.instruction.roof": 'Repasse les deux côtés de chaque toit.',
+    "diagonal_lines.instruction.ice_cream": 'Repasse chaque cornet de glace.',
+    "diagonal_lines.instruction.kite_frame": 'Repasse les bâtons du cerf-volant. Fais un X.',
+    "diagonal_lines.instruction.tent": 'Repasse les deux côtés de chaque tente.',
+    "diagonal_lines.instruction.ski": 'Repasse la piste de ski sur la montagne.',
+    "diagonal_lines.instruction.treasure": 'Dessine un X sur chaque carte, de rond en rond.',
+    "diagonal_lines.instruction.star": 'Dessine les étoiles vers la lune, de rond en rond.',
+})

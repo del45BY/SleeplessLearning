@@ -100,3 +100,18 @@ STRINGS.update({
     "horizontal_lines.instruction.snail": 'Gambar jalan ke daun, dari lingkaran ke lingkaran.',
     "horizontal_lines.instruction.ant": 'Gambar jalan ke kue, dari lingkaran ke lingkaran.',
 })
+
+# --- diagonal_lines ---
+STRINGS.update({
+    "diagonal_lines.title": 'Garis Miring',
+    "diagonal_lines.instruction.slide": 'Tebalkan perosotan dari atas ke bawah.',
+    "diagonal_lines.instruction.ladder": 'Tebalkan tangga dari jendela ke tanah.',
+    "diagonal_lines.instruction.kite_string": 'Tebalkan tali layang-layang ke bawah.',
+    "diagonal_lines.instruction.roof": 'Tebalkan kedua sisi atap.',
+    "diagonal_lines.instruction.ice_cream": 'Tebalkan kerucut es krim.',
+    "diagonal_lines.instruction.kite_frame": 'Tebalkan rangka layang-layang. Buat huruf X.',
+    "diagonal_lines.instruction.tent": 'Tebalkan kedua sisi tenda.',
+    "diagonal_lines.instruction.ski": 'Tebalkan jalur ski menuruni gunung.',
+    "diagonal_lines.instruction.treasure": 'Gambar X di setiap peta, dari lingkaran ke lingkaran.',
+    "diagonal_lines.instruction.star": 'Gambar bintang jatuh ke bulan, dari lingkaran ke lingkaran.',
+})

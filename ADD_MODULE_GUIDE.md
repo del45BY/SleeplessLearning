@@ -9,7 +9,7 @@ Turunkan sendiri: `id` (snake_case dari judul, mis. "Match the Shapes" → `matc
 1. **Baca** `modules/_template.py` dan `core/layout.py` (kelas `Page` + docstring helper). Lihat juga satu modul contoh.
 2. **Buat** `modules/<id>.py` dari template: metadata (`id`, `title_key="<id>.title"`, `age_range`, `category`, `pages`, `series`).
    `render(page_index, ctx)` harus memanggil `ctx.draw_instruction(...)` tepat sekali, lalu menaruh elemen **hanya** lewat
-   `ctx.band / ctx.cell / draw_image_slot / draw_trace_line / draw_vertical_line / draw_horizontal_line / draw_writing_lines / draw_box / draw_text`.
+   `ctx.band / ctx.cell / draw_image_slot / draw_trace_line / draw_vertical_line / draw_horizontal_line / draw_diagonal_line / draw_writing_lines / draw_box / draw_text`.
 3. **Tambah key i18n ke SEMUA** `i18n/{en,id,es,de,fr,pt}.py` sebagai blok `STRINGS.update({...})` di bawah file.
    Key wajib: `<id>.title`, `<id>.instruction` (1 baris, pendek), plus semua label/kata. Terjemahan harus nyata
    (bukan kosong, bukan TODO). Inggris = US, Spanyol = netral. Kata bergantung bahasa (kata contoh, huruf awal,

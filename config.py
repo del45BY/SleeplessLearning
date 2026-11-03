@@ -124,6 +124,8 @@ VLINE_DOTTED = (0.01, 4.6)
 VLINE_DOTTED_PT = 2.4
 VLINE_LENGTHS = {"S": 90.0, "M": 110.0, "L": 120.0}
 VLINE_IMG_PAD_MM = 4.0
+DLINE_ROW_H_MM = {"S": 32.0, "M": 42.0, "L": 56.0}      # tinggi baris garis miring tunggal (menentukan kemiringan)
+DLINE_SHAPE_H_MM = {"S": 36.0, "M": 46.0, "L": 60.0}    # tinggi area garis untuk bentuk atap/kerucut/silang
 HLINE_ROW_GAP_MM = 8.0          # jarak antar baris garis datar (ctx.draw_horizontal_line)
 WRITE_ROW_H_MM = 14.0                              # tinggi baris menulis kosong
 

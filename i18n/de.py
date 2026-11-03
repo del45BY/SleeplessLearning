@@ -100,3 +100,18 @@ STRINGS.update({
     "horizontal_lines.instruction.snail": 'Zeichne den Weg zum Blatt, von Kreis zu Kreis.',
     "horizontal_lines.instruction.ant": 'Zeichne den Weg zum Keks, von Kreis zu Kreis.',
 })
+
+# --- diagonal_lines ---
+STRINGS.update({
+    "diagonal_lines.title": 'Schräge Linien',
+    "diagonal_lines.instruction.slide": 'Fahre die Rutsche von oben nach unten nach.',
+    "diagonal_lines.instruction.ladder": 'Fahre die Leiter vom Fenster zum Boden nach.',
+    "diagonal_lines.instruction.kite_string": 'Fahre die Drachenschnüre nach unten nach.',
+    "diagonal_lines.instruction.roof": 'Fahre beide Seiten jedes Dachs nach.',
+    "diagonal_lines.instruction.ice_cream": 'Fahre jede Eistüte nach.',
+    "diagonal_lines.instruction.kite_frame": 'Fahre die Drachenstäbe nach. Zeichne ein X.',
+    "diagonal_lines.instruction.tent": 'Fahre beide Seiten jedes Zelts nach.',
+    "diagonal_lines.instruction.ski": 'Fahre die Skipiste den Berg hinunter nach.',
+    "diagonal_lines.instruction.treasure": 'Zeichne ein X auf jede Karte, von Kreis zu Kreis.',
+    "diagonal_lines.instruction.star": 'Zeichne die Sterne zum Mond, von Kreis zu Kreis.',
+})

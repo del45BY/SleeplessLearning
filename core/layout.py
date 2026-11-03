@@ -191,6 +191,7 @@ class Page:
       draw_writing_lines(cell, rows)        baris menulis kosong
       draw_vertical_line(cell, style)       garis tegak atas->bawah (dashed|dotted|points)
       draw_horizontal_line(cell, style)     garis datar kiri->kanan (dashed|dotted|points)
+      draw_diagonal_line(cell, direction, style)  garis miring: down_right|down_left|roof (A)|vee (V)|cross (X)
       draw_box(rect, ...)                   kotak/bingkai (kontainer)
       draw_text(rect, text, ...)            teks 1 baris
     """
@@ -477,6 +478,74 @@ class Page:
             path.lineTo(cell.right * MM, Y)
             path.lineTo((cell.right - A) * MM, Y - A * MM)
             c.drawPath(path, stroke=1, fill=0)
+        c.restoreState()
+
+    def draw_diagonal_line(self, cell: Rect, direction: str = "down_right", style: str = "dashed", *,
+                           group: str = "", value: str = "") -> None:
+        """Garis miring di dalam `cell` (bounding box = seluruh cell; gambar lain harus di luar cell).
+
+        direction: "down_right" (kiri-atas -> kanan-bawah), "down_left" (kanan-atas -> kiri-bawah),
+                   "roof" (^, dua garis dari puncak tengah-atas turun ke kiri & kanan = bentuk A),
+                   "vee" (V, dua garis dari sudut atas bertemu di tengah-bawah),
+                   "cross" (X, dua garis bersilang).
+        style: "dashed" | "dotted" | "points". Awal goresan = lingkaran (accent), akhir = panah
+        (atau lingkaran untuk "points").
+        """
+        dirs = ("down_right", "down_left", "roof", "vee", "cross")
+        if direction not in dirs:
+            raise ValueError(f"direction garis miring tidak dikenal: {direction!r} (pilihan: {', '.join(dirs)})")
+        if style not in ("dashed", "dotted", "points"):
+            raise ValueError(f"style garis miring tidak dikenal: {style!r}")
+        R, A = config.VLINE_MARKER_R_MM, config.VLINE_ARROW_MM
+        h = max(R, A)
+        x0, x1, y0, y1 = cell.x + h, cell.right - h, cell.y + h, cell.bottom - h
+        xm = (x0 + x1) / 2
+        strokes = {"down_right": [((x0, y0), (x1, y1))], "down_left": [((x1, y0), (x0, y1))],
+                   "roof": [((xm, y0), (x0, y1)), ((xm, y0), (x1, y1))],
+                   "vee": [((x0, y0), (xm, y1)), ((x1, y0), (xm, y1))],
+                   "cross": [((x0, y0), (x1, y1)), ((x1, y0), (x0, y1))]}[direction]
+        self._log(Element("dline", cell, within=cell, group=group, value=value))
+        starts = list(dict.fromkeys((round(a[0], 2), round(a[1], 2)) for a, _ in strokes))
+        ends = list(dict.fromkeys((round(b[0], 2), round(b[1], 2)) for _, b in strokes))
+        c = self.c
+        c.saveState()
+        c.setLineWidth(self._lw(config.LINE_THICK_PT))
+        self._stroke("accent")
+        self._fill("paper")
+        for sx, sy in starts:
+            c.circle(sx * MM, self._y(sy), R * MM, stroke=1, fill=1)
+        self._stroke("trace")
+        if style == "points":
+            for ex, ey in ends:
+                c.circle(ex * MM, self._y(ey), R * MM, stroke=1, fill=1)
+        else:
+            c.setLineCap(1)
+            c.setLineJoin(1)
+            if style == "dashed":
+                c.setLineWidth(self._lw(config.TRACE_CENTER_STROKE_PT))
+                c.setDash(list(config.TRACE_CENTER_DASH))
+            else:
+                c.setLineWidth(self._lw(config.VLINE_DOTTED_PT))
+                c.setDash(list(config.VLINE_DOTTED))
+            units = []
+            for (sx, sy), (ex, ey) in strokes:
+                L = math.hypot(ex - sx, ey - sy)
+                ux, uy = (ex - sx) / L, (ey - sy) / L
+                units.append((ex, ey, ux, uy))
+                c.line((sx + ux * (R + 1.0)) * MM, self._y(sy + uy * (R + 1.0)),
+                       (ex - ux * A * 0.3) * MM, self._y(ey - uy * A * 0.3))
+            c.setDash([])
+            c.setLineWidth(self._lw(config.LINE_THICK_PT))
+            for ex, ey, ux, uy in units:                       # panah (chevron) searah garis
+                path = c.beginPath()
+                wings = []
+                for ang in (math.radians(35), math.radians(-35)):
+                    rx, ry = ux * math.cos(ang) - uy * math.sin(ang), ux * math.sin(ang) + uy * math.cos(ang)
+                    wings.append((ex - A * 1.15 * rx, ey - A * 1.15 * ry))
+                path.moveTo(wings[0][0] * MM, self._y(wings[0][1]))
+                path.lineTo(ex * MM, self._y(ey))
+                path.lineTo(wings[1][0] * MM, self._y(wings[1][1]))
+                c.drawPath(path, stroke=1, fill=0)
         c.restoreState()
 
     def draw_instruction(self, text: str, icon: str = "icon_pencil") -> None:

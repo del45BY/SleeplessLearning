@@ -100,3 +100,18 @@ STRINGS.update({
     "horizontal_lines.instruction.snail": 'Draw the path to the leaf, circle to circle.',
     "horizontal_lines.instruction.ant": 'Draw the path to the cookie, circle to circle.',
 })
+
+# --- diagonal_lines ---
+STRINGS.update({
+    "diagonal_lines.title": 'Diagonal Lines',
+    "diagonal_lines.instruction.slide": 'Trace the slide from the top to the bottom.',
+    "diagonal_lines.instruction.ladder": 'Trace the ladder from the window to the ground.',
+    "diagonal_lines.instruction.kite_string": 'Trace the kite strings down to the hands.',
+    "diagonal_lines.instruction.roof": 'Trace both sides of each roof.',
+    "diagonal_lines.instruction.ice_cream": 'Trace each ice cream cone.',
+    "diagonal_lines.instruction.kite_frame": 'Trace the kite sticks. Make an X.',
+    "diagonal_lines.instruction.tent": 'Trace both sides of each tent.',
+    "diagonal_lines.instruction.ski": 'Trace the ski path down the mountain.',
+    "diagonal_lines.instruction.treasure": 'Draw an X on each map, circle to circle.',
+    "diagonal_lines.instruction.star": 'Draw the stars falling to the moon, circle to circle.',
+})
