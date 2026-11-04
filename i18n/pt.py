@@ -115,3 +115,63 @@ STRINGS.update({
     "diagonal_lines.instruction.treasure": 'Desenhe um X em cada mapa, de círculo em círculo.',
     "diagonal_lines.instruction.star": 'Desenhe as estrelas até a lua, de círculo em círculo.',
 })
+
+# --- zigzag_lines ---
+STRINGS.update({
+    "zigzag_lines.title": 'Linhas em zigue-zague',
+    "zigzag_lines.instruction.mountain_one": 'Cubra a montanha do alpinista até a bandeira.',
+    "zigzag_lines.instruction.mountain_two": 'Cubra as duas montanhas.',
+    "zigzag_lines.instruction.mountain_many": 'Cubra as montanhas. Suba e desça.',
+    "zigzag_lines.instruction.lightning": 'Cubra o raio da nuvem para baixo.',
+    "zigzag_lines.instruction.fence": 'Cubra a cerca de pontas para o gato.',
+    "zigzag_lines.instruction.road": 'Cubra a estrada com curvas do carro até a casa.',
+    "zigzag_lines.instruction.lightning_dots": 'Cubra o raio. Siga os pontinhos.',
+    "zigzag_lines.instruction.river": 'Cubra o rio com curvas do barco até a ilha.',
+    "zigzag_lines.instruction.lightning_draw": 'Desenhe o raio, de círculo em círculo.',
+    "zigzag_lines.instruction.mountain_draw": 'Desenhe as montanhas, de círculo em círculo.',
+})
+
+# --- curved_lines ---
+STRINGS.update({
+    "curved_lines.title": 'Linhas curvas',
+    "curved_lines.instruction.rainbow_one": 'Cubra o arco-íris de nuvem em nuvem.',
+    "curved_lines.instruction.rainbow_three": 'Cubra as três faixas de cada arco-íris.',
+    "curved_lines.instruction.smile": 'Cubra um sorriso em cada rosto.',
+    "curved_lines.instruction.rope": 'Cubra a corda entre os postes.',
+    "curved_lines.instruction.umbrella": 'Cubra o guarda-chuva e o cabo.',
+    "curved_lines.instruction.caterpillar": 'Cubra os morros da lagarta.',
+    "curved_lines.instruction.hook": 'Cubra as linhas de pesca até os anzóis.',
+    "curved_lines.instruction.lollipop": 'Cubra o redemoinho de cada pirulito.',
+    "curved_lines.instruction.rainbow_draw": 'Desenhe os arco-íris, de círculo em círculo.',
+    "curved_lines.instruction.umbrella_draw": 'Desenhe os guarda-chuvas, de círculo em círculo.',
+})
+
+# --- wavy_lines ---
+STRINGS.update({
+    "wavy_lines.title": 'Linhas onduladas',
+    "wavy_lines.instruction.sea_one": 'Cubra as ondas grandes do peixe até a concha.',
+    "wavy_lines.instruction.sea_two": 'Cubra as ondas. Sobe e desce, sobe e desce.',
+    "wavy_lines.instruction.snake": 'Cubra a cobra ondulada até a maçã.',
+    "wavy_lines.instruction.river": 'Cubra o rio com curvas da montanha até o lago.',
+    "wavy_lines.instruction.hair": 'Cubra o cabelo ondulado embaixo de cada laço.',
+    "wavy_lines.instruction.sea_dots": 'Cubra as ondas do mar. Siga os pontinhos.',
+    "wavy_lines.instruction.snake_dots": 'Cubra as cobras. Siga os pontinhos.',
+    "wavy_lines.instruction.hair_dots": 'Cubra o cabelo ondulado. Siga os pontinhos.',
+    "wavy_lines.instruction.sea_draw": 'Desenhe as ondas, de círculo em círculo.',
+    "wavy_lines.instruction.river_draw": 'Desenhe os rios, de círculo em círculo.',
+})
+
+# --- circles_spirals ---
+STRINGS.update({
+    "circles_spirals.title": 'Círculos e espirais',
+    "circles_spirals.instruction.ball": 'Cubra a bola. Comece em cima.',
+    "circles_spirals.instruction.sun": 'Cubra o sol em cima de cada casa.',
+    "circles_spirals.instruction.wheel": 'Cubra as duas rodas de cada carro.',
+    "circles_spirals.instruction.target": 'Cubra todos os círculos de cada alvo.',
+    "circles_spirals.instruction.snail": 'Cubra a concha do caracol. Gire e gire.',
+    "circles_spirals.instruction.bubble": 'Cubra as bolhas em cima do peixe.',
+    "circles_spirals.instruction.bike": 'Cubra as duas rodas de cada bicicleta.',
+    "circles_spirals.instruction.snail_out": 'Cubra a concha do caracol do meio para fora.',
+    "circles_spirals.instruction.target_draw": 'Desenhe os alvos, de círculo em círculo.',
+    "circles_spirals.instruction.snail_draw": 'Desenhe as conchas, de círculo em círculo.',
+})

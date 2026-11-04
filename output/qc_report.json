@@ -1,8 +1,8 @@
 {
   "summary": {
     "scopes": 2,
-    "fail": 0,
-    "warn": 3
+    "fail": 2,
+    "warn": 2
   },
   "scopes": {
     "_global": {
@@ -34,8 +34,8 @@
         }
       }
     },
-    "vertical_lines": {
-      "status": "WARN",
+    "wavy_lines": {
+      "status": "FAIL",
       "areas": {
         "i18n": {
           "status": "PASS",
@@ -46,11 +46,19 @@
           "findings": []
         },
         "images": {
-          "status": "WARN",
+          "status": "FAIL",
           "findings": [
             {
+              "level": "FAIL",
+              "message": "'icon_pencil.png' resolusi 96x96 terlalu kecil",
+              "context": [
+                "en/bw",
+                "en/color"
+              ]
+            },
+            {
               "level": "WARN",
-              "message": "7 gambar masih placeholder: cupcake, flame, grass_tuft, icicle, icon_pencil, lollipop, … (+1)",
+              "message": "5 gambar masih placeholder: bow, lake, mountain, shell, snake",
               "context": [
                 "en/bw",
                 "en/color"
@@ -59,16 +67,8 @@
           ]
         },
         "pdf": {
-          "status": "WARN",
-          "findings": [
-            {
-              "level": "WARN",
-              "message": "Ukuran file 9.2 MB cukup besar",
-              "context": [
-                "en/color"
-              ]
-            }
-          ]
+          "status": "PASS",
+          "findings": []
         },
         "mode": {
           "status": "PASS",

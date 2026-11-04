@@ -115,3 +115,63 @@ STRINGS.update({
     "diagonal_lines.instruction.treasure": 'Dessine un X sur chaque carte, de rond en rond.',
     "diagonal_lines.instruction.star": 'Dessine les étoiles vers la lune, de rond en rond.',
 })
+
+# --- zigzag_lines ---
+STRINGS.update({
+    "zigzag_lines.title": 'Lignes en zigzag',
+    "zigzag_lines.instruction.mountain_one": 'Repasse la montagne du randonneur au drapeau.',
+    "zigzag_lines.instruction.mountain_two": 'Repasse les deux montagnes.',
+    "zigzag_lines.instruction.mountain_many": 'Repasse les montagnes. Monte et descends.',
+    "zigzag_lines.instruction.lightning": "Repasse l'éclair du nuage vers le bas.",
+    "zigzag_lines.instruction.fence": 'Repasse la clôture en dents de scie pour le chat.',
+    "zigzag_lines.instruction.road": 'Repasse la route sinueuse de la voiture à la maison.',
+    "zigzag_lines.instruction.lightning_dots": "Repasse l'éclair. Suis les points.",
+    "zigzag_lines.instruction.river": "Repasse la rivière sinueuse du bateau à l'île.",
+    "zigzag_lines.instruction.lightning_draw": "Dessine l'éclair, de rond en rond.",
+    "zigzag_lines.instruction.mountain_draw": 'Dessine les montagnes, de rond en rond.',
+})
+
+# --- curved_lines ---
+STRINGS.update({
+    "curved_lines.title": 'Lignes courbes',
+    "curved_lines.instruction.rainbow_one": "Repasse l'arc-en-ciel de nuage en nuage.",
+    "curved_lines.instruction.rainbow_three": 'Repasse les trois bandes de chaque arc-en-ciel.',
+    "curved_lines.instruction.smile": 'Repasse un sourire sur chaque visage.',
+    "curved_lines.instruction.rope": 'Repasse la corde entre les poteaux.',
+    "curved_lines.instruction.umbrella": 'Repasse le parapluie et sa poignée.',
+    "curved_lines.instruction.caterpillar": 'Repasse les collines de la chenille.',
+    "curved_lines.instruction.hook": "Repasse les lignes de pêche jusqu'aux hameçons.",
+    "curved_lines.instruction.lollipop": 'Repasse la spirale de chaque sucette.',
+    "curved_lines.instruction.rainbow_draw": 'Dessine les arcs-en-ciel, de rond en rond.',
+    "curved_lines.instruction.umbrella_draw": 'Dessine les parapluies, de rond en rond.',
+})
+
+# --- wavy_lines ---
+STRINGS.update({
+    "wavy_lines.title": 'Lignes ondulées',
+    "wavy_lines.instruction.sea_one": 'Repasse les grandes vagues du poisson au coquillage.',
+    "wavy_lines.instruction.sea_two": 'Repasse les vagues. Monte et descends.',
+    "wavy_lines.instruction.snake": "Repasse le serpent ondulé jusqu'à la pomme.",
+    "wavy_lines.instruction.river": 'Repasse la rivière sinueuse de la montagne au lac.',
+    "wavy_lines.instruction.hair": 'Repasse les cheveux ondulés sous chaque nœud.',
+    "wavy_lines.instruction.sea_dots": 'Repasse les vagues de la mer. Suis les points.',
+    "wavy_lines.instruction.snake_dots": 'Repasse les serpents. Suis les points.',
+    "wavy_lines.instruction.hair_dots": 'Repasse les cheveux ondulés. Suis les points.',
+    "wavy_lines.instruction.sea_draw": 'Dessine les vagues, de rond en rond.',
+    "wavy_lines.instruction.river_draw": 'Dessine les rivières, de rond en rond.',
+})
+
+# --- circles_spirals ---
+STRINGS.update({
+    "circles_spirals.title": 'Cercles et spirales',
+    "circles_spirals.instruction.ball": 'Repasse le ballon. Commence en haut.',
+    "circles_spirals.instruction.sun": 'Repasse le soleil au-dessus de chaque maison.',
+    "circles_spirals.instruction.wheel": 'Repasse les deux roues de chaque voiture.',
+    "circles_spirals.instruction.target": 'Repasse tous les cercles de chaque cible.',
+    "circles_spirals.instruction.snail": "Repasse la coquille de l'escargot. Tourne, tourne.",
+    "circles_spirals.instruction.bubble": 'Repasse les bulles au-dessus du poisson.',
+    "circles_spirals.instruction.bike": 'Repasse les deux roues de chaque vélo.',
+    "circles_spirals.instruction.snail_out": "Repasse la coquille de l'escargot du centre vers l'extérieur.",
+    "circles_spirals.instruction.target_draw": 'Dessine les cibles, de rond en rond.',
+    "circles_spirals.instruction.snail_draw": 'Dessine les coquilles, de rond en rond.',
+})

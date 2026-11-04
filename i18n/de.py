@@ -115,3 +115,63 @@ STRINGS.update({
     "diagonal_lines.instruction.treasure": 'Zeichne ein X auf jede Karte, von Kreis zu Kreis.',
     "diagonal_lines.instruction.star": 'Zeichne die Sterne zum Mond, von Kreis zu Kreis.',
 })
+
+# --- zigzag_lines ---
+STRINGS.update({
+    "zigzag_lines.title": 'Zickzacklinien',
+    "zigzag_lines.instruction.mountain_one": 'Fahre den Berg vom Wanderer zur Fahne nach.',
+    "zigzag_lines.instruction.mountain_two": 'Fahre die zwei Berge nach.',
+    "zigzag_lines.instruction.mountain_many": 'Fahre die Berge nach. Hoch und runter.',
+    "zigzag_lines.instruction.lightning": 'Fahre den Blitz von der Wolke nach unten nach.',
+    "zigzag_lines.instruction.fence": 'Fahre den Zackenzaun für die Katze nach.',
+    "zigzag_lines.instruction.road": 'Fahre die Kurvenstraße vom Auto zum Haus nach.',
+    "zigzag_lines.instruction.lightning_dots": 'Fahre den Blitz nach. Folge den Punkten.',
+    "zigzag_lines.instruction.river": 'Fahre den kurvigen Fluss vom Boot zur Insel nach.',
+    "zigzag_lines.instruction.lightning_draw": 'Zeichne den Blitz, von Kreis zu Kreis.',
+    "zigzag_lines.instruction.mountain_draw": 'Zeichne die Berge, von Kreis zu Kreis.',
+})
+
+# --- curved_lines ---
+STRINGS.update({
+    "curved_lines.title": 'Gebogene Linien',
+    "curved_lines.instruction.rainbow_one": 'Fahre den Regenbogen von Wolke zu Wolke nach.',
+    "curved_lines.instruction.rainbow_three": 'Fahre alle drei Streifen jedes Regenbogens nach.',
+    "curved_lines.instruction.smile": 'Fahre bei jedem Gesicht das Lächeln nach.',
+    "curved_lines.instruction.rope": 'Fahre das Seil zwischen den Pfosten nach.',
+    "curved_lines.instruction.umbrella": 'Fahre den Schirm und den Griff nach.',
+    "curved_lines.instruction.caterpillar": 'Fahre die Hügel für die Raupe nach.',
+    "curved_lines.instruction.hook": 'Fahre die Angelschnüre bis zu den Haken nach.',
+    "curved_lines.instruction.lollipop": 'Fahre den Wirbel jedes Lutschers nach.',
+    "curved_lines.instruction.rainbow_draw": 'Zeichne die Regenbogen, von Kreis zu Kreis.',
+    "curved_lines.instruction.umbrella_draw": 'Zeichne die Schirme, von Kreis zu Kreis.',
+})
+
+# --- wavy_lines ---
+STRINGS.update({
+    "wavy_lines.title": 'Wellenlinien',
+    "wavy_lines.instruction.sea_one": 'Fahre die großen Wellen vom Fisch zur Muschel nach.',
+    "wavy_lines.instruction.sea_two": 'Fahre die Wellen nach. Rauf und runter.',
+    "wavy_lines.instruction.snake": 'Fahre die Schlange bis zum Apfel nach.',
+    "wavy_lines.instruction.river": 'Fahre den Flusslauf vom Berg zum See nach.',
+    "wavy_lines.instruction.hair": 'Fahre die welligen Haare unter jeder Schleife nach.',
+    "wavy_lines.instruction.sea_dots": 'Fahre die Meereswellen nach. Folge den Punkten.',
+    "wavy_lines.instruction.snake_dots": 'Fahre die Schlangen nach. Folge den Punkten.',
+    "wavy_lines.instruction.hair_dots": 'Fahre die welligen Haare nach. Folge den Punkten.',
+    "wavy_lines.instruction.sea_draw": 'Zeichne die Wellen, von Kreis zu Kreis.',
+    "wavy_lines.instruction.river_draw": 'Zeichne die Flüsse, von Kreis zu Kreis.',
+})
+
+# --- circles_spirals ---
+STRINGS.update({
+    "circles_spirals.title": 'Kreise und Spiralen',
+    "circles_spirals.instruction.ball": 'Fahre den Ball nach. Fang oben an.',
+    "circles_spirals.instruction.sun": 'Fahre die Sonne über jedem Haus nach.',
+    "circles_spirals.instruction.wheel": 'Fahre die zwei Räder jedes Autos nach.',
+    "circles_spirals.instruction.target": 'Fahre alle Kreise jeder Zielscheibe nach.',
+    "circles_spirals.instruction.snail": 'Fahre das Schneckenhaus nach. Immer rundherum.',
+    "circles_spirals.instruction.bubble": 'Fahre die Blasen über dem Fisch nach.',
+    "circles_spirals.instruction.bike": 'Fahre die zwei Räder jedes Fahrrads nach.',
+    "circles_spirals.instruction.snail_out": 'Fahre das Schneckenhaus von der Mitte nach außen nach.',
+    "circles_spirals.instruction.target_draw": 'Zeichne die Zielscheiben, von Kreis zu Kreis.',
+    "circles_spirals.instruction.snail_draw": 'Zeichne die Schneckenhäuser, von Kreis zu Kreis.',
+})

@@ -115,3 +115,63 @@ STRINGS.update({
     "diagonal_lines.instruction.treasure": 'Draw an X on each map, circle to circle.',
     "diagonal_lines.instruction.star": 'Draw the stars falling to the moon, circle to circle.',
 })
+
+# --- zigzag_lines ---
+STRINGS.update({
+    "zigzag_lines.title": 'Zigzag Lines',
+    "zigzag_lines.instruction.mountain_one": 'Trace the mountain from the hiker to the flag.',
+    "zigzag_lines.instruction.mountain_two": 'Trace the two mountains.',
+    "zigzag_lines.instruction.mountain_many": 'Trace the mountains. Go up and down.',
+    "zigzag_lines.instruction.lightning": 'Trace the lightning from the cloud down.',
+    "zigzag_lines.instruction.fence": 'Trace the zigzag fence for the cat.',
+    "zigzag_lines.instruction.road": 'Trace the winding road from the car to the house.',
+    "zigzag_lines.instruction.lightning_dots": 'Trace the lightning. Follow the dots.',
+    "zigzag_lines.instruction.river": 'Trace the winding river from the boat to the island.',
+    "zigzag_lines.instruction.lightning_draw": 'Draw the lightning, circle to circle.',
+    "zigzag_lines.instruction.mountain_draw": 'Draw the mountains, circle to circle.',
+})
+
+# --- curved_lines ---
+STRINGS.update({
+    "curved_lines.title": 'Curved Lines',
+    "curved_lines.instruction.rainbow_one": 'Trace the rainbow from cloud to cloud.',
+    "curved_lines.instruction.rainbow_three": 'Trace all three bands of each rainbow.',
+    "curved_lines.instruction.smile": 'Trace a smile on each face.',
+    "curved_lines.instruction.rope": 'Trace the rope between the poles.',
+    "curved_lines.instruction.umbrella": 'Trace the umbrella top and the handle.',
+    "curved_lines.instruction.caterpillar": 'Trace the hills for the caterpillar.',
+    "curved_lines.instruction.hook": 'Trace the fishing lines down to the hooks.',
+    "curved_lines.instruction.lollipop": 'Trace the swirl on each lollipop.',
+    "curved_lines.instruction.rainbow_draw": 'Draw the rainbows, circle to circle.',
+    "curved_lines.instruction.umbrella_draw": 'Draw the umbrellas, circle to circle.',
+})
+
+# --- wavy_lines ---
+STRINGS.update({
+    "wavy_lines.title": 'Wavy Lines',
+    "wavy_lines.instruction.sea_one": 'Trace the big waves from the fish to the shell.',
+    "wavy_lines.instruction.sea_two": 'Trace the waves. Up and down, up and down.',
+    "wavy_lines.instruction.snake": 'Trace the wavy snake to the apple.',
+    "wavy_lines.instruction.river": 'Trace the wavy river from the mountain to the lake.',
+    "wavy_lines.instruction.hair": 'Trace the wavy hair under each bow.',
+    "wavy_lines.instruction.sea_dots": 'Trace the sea waves. Follow the dots.',
+    "wavy_lines.instruction.snake_dots": 'Trace the wavy snakes. Follow the dots.',
+    "wavy_lines.instruction.hair_dots": 'Trace the wavy hair. Follow the dots.',
+    "wavy_lines.instruction.sea_draw": 'Draw the waves, circle to circle.',
+    "wavy_lines.instruction.river_draw": 'Draw the rivers, circle to circle.',
+})
+
+# --- circles_spirals ---
+STRINGS.update({
+    "circles_spirals.title": 'Circles & Spirals',
+    "circles_spirals.instruction.ball": 'Trace the ball. Start at the top.',
+    "circles_spirals.instruction.sun": 'Trace the sun above each house.',
+    "circles_spirals.instruction.wheel": 'Trace the two wheels of each car.',
+    "circles_spirals.instruction.target": 'Trace all the circles on each target.',
+    "circles_spirals.instruction.snail": "Trace the snail's shell. Go round and round.",
+    "circles_spirals.instruction.bubble": 'Trace the bubbles above the fish.',
+    "circles_spirals.instruction.bike": 'Trace the two wheels of each bike.',
+    "circles_spirals.instruction.snail_out": "Trace the snail's shell from the middle out.",
+    "circles_spirals.instruction.target_draw": 'Draw the targets, circle to circle.',
+    "circles_spirals.instruction.snail_draw": 'Draw the shells from the middle, circle to circle.',
+})

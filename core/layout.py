@@ -192,6 +192,8 @@ class Page:
       draw_vertical_line(cell, style)       garis tegak atas->bawah (dashed|dotted|points)
       draw_horizontal_line(cell, style)     garis datar kiri->kanan (dashed|dotted|points)
       draw_diagonal_line(cell, direction, style)  garis miring: down_right|down_left|roof (A)|vee (V)|cross (X)
+      draw_zigzag_line(cell, segments, orientation, style)  zigzag / jalan berliku (horizontal|vertical)
+      draw_curved_line(cell, shape, style)  lengkung: arch (pelangi) | smile | sag (tali) | hook (J) | spiral
       draw_box(rect, ...)                   kotak/bingkai (kontainer)
       draw_text(rect, text, ...)            teks 1 baris
     """
@@ -279,11 +281,14 @@ class Page:
             c.drawCentredString(rect.cx * MM, base, text)
 
     def draw_image_slot(self, cell: Rect, image_id: str, size: str = "M", *, group: str = "",
-                        value: str = "", zone: str = "content", kind: str = "image") -> None:
-        """Gambar PNG di slot persegi ukuran token (S/M/L/XL), rata tengah sel."""
+                        value: str = "", zone: str = "content", kind: str = "image",
+                        container: bool = False) -> None:
+        """Gambar PNG di slot persegi ukuran token (S/M/L/XL), rata tengah sel.
+        container=True: gambar latar yang boleh ditimpa elemen lain yang berada sepenuhnya di dalamnya
+        (mis. garis senyum di dalam wajah)."""
         side = config.IMG_SIZES[size]
         sq = cell.center_square(side)
-        self._log(Element(kind, sq, zone, within=cell, image=image_id, group=group, value=value))
+        self._log(Element(kind, sq, zone, container=container, within=cell, image=image_id, group=group, value=value))
         path = self.assets.path(image_id, self.mode)
         self.c.drawImage(str(path), sq.x * MM, self._y(sq.bottom), side * MM, side * MM,
                          mask="auto", preserveAspectRatio=True, anchor="c")
@@ -546,6 +551,222 @@ class Page:
                 path.lineTo(ex * MM, self._y(ey))
                 path.lineTo(wings[1][0] * MM, self._y(wings[1][1]))
                 c.drawPath(path, stroke=1, fill=0)
+        c.restoreState()
+
+    def draw_zigzag_line(self, cell: Rect, segments: int = 4, orientation: str = "horizontal",
+                         style: str = "dashed", *, smooth: bool = False, center_ends: bool = False,
+                         amp: float = 1.0, group: str = "", value: str = "") -> None:
+        """Garis zigzag (atau gelombang mulus) di dalam `cell` (bounding box = seluruh cell).
+
+        orientation: "horizontal" (kiri -> kanan; awal di bawah) | "vertical" (atas -> bawah; awal di kiri).
+        segments: jumlah ruas lurus (zigzag) atau jumlah belokan/setengah gelombang (smooth=True); >= 2.
+        smooth: True = melengkung mulus (jalan/sungai berliku). center_ends: awal & akhir di tengah sumbu silang.
+        amp: 0..1, lebar simpangan relatif terhadap cell.
+        style: "dashed" | "dotted" | "points" (lingkaran di setiap belokan; anak menghubungkan sendiri).
+        Awal = lingkaran (accent); akhir = panah (atau lingkaran untuk "points").
+        """
+        if orientation not in ("horizontal", "vertical"):
+            raise ValueError(f"orientation zigzag tidak dikenal: {orientation!r}")
+        if style not in ("dashed", "dotted", "points"):
+            raise ValueError(f"style zigzag tidak dikenal: {style!r}")
+        if not (isinstance(segments, int) and segments >= 2):
+            raise ValueError("segments zigzag harus integer >= 2")
+        if not 0 < amp <= 1:
+            raise ValueError("amp zigzag harus 0 < amp <= 1")
+        R, A = config.VLINE_MARKER_R_MM, config.VLINE_ARROW_MM
+        h = max(R, A)
+        x0, x1, y0, y1 = cell.x + h, cell.right - h, cell.y + h, cell.bottom - h
+        xm, ym, n = (x0 + x1) / 2, (y0 + y1) / 2, segments
+        horiz = orientation == "horizontal"
+        a = amp * ((y1 - y0) if horiz else (x1 - x0)) / 2
+
+        def at(t: float, off: float) -> Tuple[float, float]:
+            return (x0 + (x1 - x0) * t, ym + off) if horiz else (xm + off, y0 + (y1 - y0) * t)
+
+        def vertex_off(i: int) -> float:
+            if center_ends:
+                return 0.0 if i in (0, n) else (a if i % 2 else -a)
+            return a if i % 2 == 0 else -a
+
+        if smooth:
+            N = max(24, 16 * n)
+            f = math.sin if center_ends else math.cos
+            pts = [at(k / N, a * f(math.pi * n * k / N)) for k in range(N + 1)]
+            if center_ends:
+                marks = [at(0.0, 0.0)] + [at((j + 0.5) / n, a * math.sin(math.pi * (j + 0.5))) for j in range(n)] + [at(1.0, 0.0)]
+            else:
+                marks = [at(i / n, a * math.cos(math.pi * i)) for i in range(n + 1)]
+        else:
+            pts = marks = [at(i / n, vertex_off(i)) for i in range(n + 1)]
+        self._log(Element("zline", cell, within=cell, group=group, value=value))
+        c = self.c
+        c.saveState()
+        if style != "points":
+            self._stroke("trace")
+            c.setLineCap(1)
+            c.setLineJoin(1)
+            if style == "dashed":
+                c.setLineWidth(self._lw(config.TRACE_CENTER_STROKE_PT))
+                c.setDash(list(config.TRACE_CENTER_DASH))
+            else:
+                c.setLineWidth(self._lw(config.VLINE_DOTTED_PT))
+                c.setDash(list(config.VLINE_DOTTED))
+            path = c.beginPath()
+            for j, (px, py) in enumerate(pts):
+                path.moveTo(px * MM, self._y(py)) if j == 0 else path.lineTo(px * MM, self._y(py))
+            c.drawPath(path, stroke=1, fill=0)
+            c.setDash([])
+            c.setLineWidth(self._lw(config.LINE_THICK_PT))
+            ex, ey = pts[-1]
+            bx, by = pts[-1 - min(3, len(pts) - 1)] if smooth else pts[-2]
+            L = math.hypot(ex - bx, ey - by)
+            ux, uy = (ex - bx) / L, (ey - by) / L
+            wings = []
+            for ang in (math.radians(35), math.radians(-35)):
+                rx, ry = ux * math.cos(ang) - uy * math.sin(ang), ux * math.sin(ang) + uy * math.cos(ang)
+                wings.append((ex - A * 1.15 * rx, ey - A * 1.15 * ry))
+            arrow = c.beginPath()
+            arrow.moveTo(wings[0][0] * MM, self._y(wings[0][1]))
+            arrow.lineTo(ex * MM, self._y(ey))
+            arrow.lineTo(wings[1][0] * MM, self._y(wings[1][1]))
+            c.drawPath(arrow, stroke=1, fill=0)
+        else:
+            c.setLineWidth(self._lw(config.LINE_THICK_PT))
+            self._stroke("trace")
+            self._fill("paper")
+            for mx, my in marks[1:]:
+                c.circle(mx * MM, self._y(my), R * MM, stroke=1, fill=1)
+        c.setLineWidth(self._lw(config.LINE_THICK_PT))
+        self._stroke("accent")
+        self._fill("paper")
+        c.circle(pts[0][0] * MM, self._y(pts[0][1]), R * MM, stroke=1, fill=1)
+        c.restoreState()
+
+    def draw_curved_line(self, cell: Rect, shape: str = "arch", style: str = "dashed", *, rings: int = 1,
+                         depth: float = 1.0, group: str = "", value: str = "") -> None:
+        """Garis lengkung di dalam `cell` (bounding box = seluruh cell).
+
+        shape: "arch" (busur ∩ dari kiri-bawah ke kanan-bawah; rings 1-3 = lengkung bersarang seperti pelangi),
+               "smile" (busur ∪ dari kiri-atas ke kanan-atas), "sag" (tali menggantung antar dua titik atas),
+               "hook" (batang tegak turun lalu melengkung ke kiri = gagang payung/kail),
+               "spiral" (dari tepi luar ke pusat), "spiral_out" (dari pusat ke tepi luar),
+               "circle" (lingkaran penuh, mulai dari atas berlawanan arah jarum jam; rings 1-3 = lingkaran bersarang).
+        depth: 0..1, tinggi lengkung relatif terhadap cell (arch/smile/sag).
+        style: "dashed" | "dotted" | "points" (lingkaran di awal, puncak, dan akhir; anak menarik sendiri).
+        Awal = lingkaran (accent); akhir = panah (atau lingkaran untuk "points").
+        """
+        shapes = ("arch", "smile", "sag", "hook", "spiral", "spiral_out", "circle")
+        if shape not in shapes:
+            raise ValueError(f"shape lengkung tidak dikenal: {shape!r} (pilihan: {', '.join(shapes)})")
+        if style not in ("dashed", "dotted", "points"):
+            raise ValueError(f"style lengkung tidak dikenal: {style!r}")
+        if not (isinstance(rings, int) and 1 <= rings <= 3):
+            raise ValueError("rings harus integer 1..3")
+        if not 0 < depth <= 1:
+            raise ValueError("depth harus 0 < depth <= 1")
+        R, A = config.VLINE_MARKER_R_MM, config.VLINE_ARROW_MM
+        h = max(R, A)
+        x0, x1, y0, y1 = cell.x + h, cell.right - h, cell.y + h, cell.bottom - h
+        W, Hh, xm, ym, N = x1 - x0, y1 - y0, (x0 + x1) / 2, (y0 + y1) / 2, 48
+        strokes: List[List[Tuple[float, float]]] = []
+        marks: List[Tuple[float, float]] = []
+        if shape in ("arch", "smile"):
+            step = config.CLINE_RING_STEP if rings > 1 else 0.0
+            for k in range(rings):
+                f = 1.0 - k * step
+                rx, ry = W / 2 * f, Hh * depth * f
+                pts = []
+                for i in range(N + 1):
+                    th = math.pi * (1 - i / N)
+                    pts.append((xm + rx * math.cos(th),
+                                y1 - ry * math.sin(th) if shape == "arch" else y0 + ry * math.sin(th)))
+                strokes.append(pts)
+                marks += [pts[0], pts[N // 2], pts[-1]]
+        elif shape == "sag":
+            pts = []
+            for i in range(N + 1):
+                x = x0 + W * i / N
+                u = (x - xm) / (W / 2)
+                pts.append((x, y0 + depth * Hh * (1 - u * u)))
+            strokes.append(pts)
+            marks += [pts[0], pts[N // 2], pts[-1]]
+        elif shape == "hook":
+            r = min(W / 4, 0.3 * Hh)
+            cx, cy = xm - r, y1 - r
+            pts = [(xm, y0), (xm, cy)]
+            for i in range(1, 25):
+                ph = 1.15 * math.pi * i / 24
+                pts.append((cx + r * math.cos(ph), cy + r * math.sin(ph)))
+            strokes.append(pts)
+            marks += [pts[0], pts[-1]]
+        elif shape == "circle":
+            step = config.CLINE_RING_STEP if rings > 1 else 0.0
+            for k in range(rings):
+                r = min(W, Hh) / 2 * (1 - k * step)
+                pts = []
+                for i in range(N + 1):                       # 330 derajat: celah kecil agar panah tidak menimpa awal
+                    th = math.radians(-90.0 - 330.0 * i / N)
+                    pts.append((xm + r * math.cos(th), ym + r * math.sin(th)))
+                strokes.append(pts)
+                marks += [(xm, ym - r), (xm - r, ym), (xm, ym + r), (xm + r, ym)]
+        else:  # spiral (luar -> pusat) atau spiral_out (pusat -> luar)
+            Rout, turns, M = min(W, Hh) / 2, 2.5, 120
+            pts = []
+            for i in range(M + 1):
+                t = i / M
+                ph, rr = 2 * math.pi * turns * t, Rout * (1 - 0.9 * t)
+                pts.append((xm + rr * math.cos(ph), ym + rr * math.sin(ph)))
+            if shape == "spiral_out":
+                pts.reverse()
+            strokes.append(pts)
+            # penuntun gaya "points": awal, satu titik per 60 derajat putaran (tidak segaris sumbu), dan akhir
+            q = int(turns * 6)
+            marks += [pts[0]] + [pts[round(M * j / q)] for j in range(1, q)] + [pts[-1]]
+        self._log(Element("cline", cell, within=cell, group=group, value=value))
+        c = self.c
+        c.saveState()
+        if style != "points":
+            self._stroke("trace")
+            c.setLineCap(1)
+            c.setLineJoin(1)
+            if style == "dashed":
+                c.setLineWidth(self._lw(config.TRACE_CENTER_STROKE_PT))
+                c.setDash(list(config.TRACE_CENTER_DASH))
+            else:
+                c.setLineWidth(self._lw(config.VLINE_DOTTED_PT))
+                c.setDash(list(config.VLINE_DOTTED))
+            for pts in strokes:
+                path = c.beginPath()
+                for j, (px, py) in enumerate(pts):
+                    path.moveTo(px * MM, self._y(py)) if j == 0 else path.lineTo(px * MM, self._y(py))
+                c.drawPath(path, stroke=1, fill=0)
+            c.setDash([])
+            c.setLineWidth(self._lw(config.LINE_THICK_PT))
+            for pts in strokes:                                   # panah searah ujung goresan
+                ex, ey = pts[-1]
+                bx, by = pts[-4]
+                L = math.hypot(ex - bx, ey - by)
+                ux, uy = (ex - bx) / L, (ey - by) / L
+                wings = []
+                for ang in (math.radians(35), math.radians(-35)):
+                    rx_, ry_ = ux * math.cos(ang) - uy * math.sin(ang), ux * math.sin(ang) + uy * math.cos(ang)
+                    wings.append((ex - A * 1.15 * rx_, ey - A * 1.15 * ry_))
+                arrow = c.beginPath()
+                arrow.moveTo(wings[0][0] * MM, self._y(wings[0][1]))
+                arrow.lineTo(ex * MM, self._y(ey))
+                arrow.lineTo(wings[1][0] * MM, self._y(wings[1][1]))
+                c.drawPath(arrow, stroke=1, fill=0)
+        else:
+            c.setLineWidth(self._lw(config.LINE_THICK_PT))
+            self._stroke("trace")
+            self._fill("paper")
+            for mx, my in marks:
+                c.circle(mx * MM, self._y(my), R * MM, stroke=1, fill=1)
+        c.setLineWidth(self._lw(config.LINE_THICK_PT))
+        self._stroke("accent")
+        self._fill("paper")
+        for pts in strokes:
+            c.circle(pts[0][0] * MM, self._y(pts[0][1]), R * MM, stroke=1, fill=1)
         c.restoreState()
 
     def draw_instruction(self, text: str, icon: str = "icon_pencil") -> None:

@@ -7,3 +7,7 @@ Catatan modul worksheet. Entri ditambahkan otomatis saat QC modul lulus.
 - `vertical_lines` — Vertical Lines · pre_writing · usia 4–5 · 10 halaman · ditambahkan 2026-11-02
 - `horizontal_lines` — Horizontal Lines · pre_writing · usia 4–5 · 10 halaman · ditambahkan 2026-11-02
 - `diagonal_lines` — Diagonal Lines · pre_writing · usia 4–5 · 10 halaman · ditambahkan 2026-11-03
+- `zigzag_lines` — Zigzag Lines · pre_writing · usia 4–5 · 10 halaman · ditambahkan 2026-11-03
+- `curved_lines` — Curved Lines · pre_writing · usia 4–5 · 10 halaman · ditambahkan 2026-11-03
+- `wavy_lines` — Wavy Lines · pre_writing · usia 4–5 · 10 halaman · ditambahkan 2026-11-04
+- `circles_spirals` — Circles & Spirals · pre_writing · usia 4–5 · 10 halaman · ditambahkan 2026-11-04

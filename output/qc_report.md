@@ -1,11 +1,11 @@
 # QC Report
 
-**FAIL: 0 · WARN: 3**
+**FAIL: 2 · WARN: 2**
 
 | Scope | Status | i18n | layout | images | pdf | mode | content |
 |---|---|---|---|---|---|---|---|
 | `_global` | **PASS** | PASS | PASS | PASS | PASS | PASS | PASS |
-| `vertical_lines` | **WARN** | PASS | PASS | WARN | WARN | PASS | PASS |
+| `wavy_lines` | **FAIL** | PASS | PASS | FAIL | PASS | PASS | PASS |
 
 ## `_global` — PASS
 - **i18n**: PASS
@@ -15,12 +15,12 @@
 - **mode**: PASS
 - **content**: PASS
 
-## `vertical_lines` — WARN
+## `wavy_lines` — FAIL
 - **i18n**: PASS
 - **layout**: PASS
-- **images**: WARN
-  - [WARN] 7 gambar masih placeholder: cupcake, flame, grass_tuft, icicle, icon_pencil, lollipop, … (+1) _(…en/bw, en/color)_
-- **pdf**: WARN
-  - [WARN] Ukuran file 9.2 MB cukup besar _(…en/color)_
+- **images**: FAIL
+  - [FAIL] 'icon_pencil.png' resolusi 96x96 terlalu kecil _(…en/bw, en/color)_
+  - [WARN] 5 gambar masih placeholder: bow, lake, mountain, shell, snake _(…en/bw, en/color)_
+- **pdf**: PASS
 - **mode**: PASS
 - **content**: PASS

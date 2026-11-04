@@ -115,3 +115,63 @@ STRINGS.update({
     "diagonal_lines.instruction.treasure": 'Gambar X di setiap peta, dari lingkaran ke lingkaran.',
     "diagonal_lines.instruction.star": 'Gambar bintang jatuh ke bulan, dari lingkaran ke lingkaran.',
 })
+
+# --- zigzag_lines ---
+STRINGS.update({
+    "zigzag_lines.title": 'Garis Zigzag',
+    "zigzag_lines.instruction.mountain_one": 'Tebalkan gunung dari pendaki ke bendera.',
+    "zigzag_lines.instruction.mountain_two": 'Tebalkan dua gunung.',
+    "zigzag_lines.instruction.mountain_many": 'Tebalkan gunung-gunung. Naik dan turun.',
+    "zigzag_lines.instruction.lightning": 'Tebalkan kilat dari awan ke bawah.',
+    "zigzag_lines.instruction.fence": 'Tebalkan pagar bergerigi untuk si kucing.',
+    "zigzag_lines.instruction.road": 'Tebalkan jalan berliku dari mobil ke rumah.',
+    "zigzag_lines.instruction.lightning_dots": 'Tebalkan kilat. Ikuti titik-titiknya.',
+    "zigzag_lines.instruction.river": 'Tebalkan sungai berliku dari perahu ke pulau.',
+    "zigzag_lines.instruction.lightning_draw": 'Gambar kilat, dari lingkaran ke lingkaran.',
+    "zigzag_lines.instruction.mountain_draw": 'Gambar gunung, dari lingkaran ke lingkaran.',
+})
+
+# --- curved_lines ---
+STRINGS.update({
+    "curved_lines.title": 'Garis Lengkung',
+    "curved_lines.instruction.rainbow_one": 'Tebalkan pelangi dari awan ke awan.',
+    "curved_lines.instruction.rainbow_three": 'Tebalkan ketiga lengkung setiap pelangi.',
+    "curved_lines.instruction.smile": 'Tebalkan senyum di setiap wajah.',
+    "curved_lines.instruction.rope": 'Tebalkan tali di antara kedua tiang.',
+    "curved_lines.instruction.umbrella": 'Tebalkan atas payung dan gagangnya.',
+    "curved_lines.instruction.caterpillar": 'Tebalkan bukit-bukit untuk ulat.',
+    "curved_lines.instruction.hook": 'Tebalkan tali pancing ke bawah sampai kail.',
+    "curved_lines.instruction.lollipop": 'Tebalkan pusaran di setiap permen.',
+    "curved_lines.instruction.rainbow_draw": 'Gambar pelangi, dari lingkaran ke lingkaran.',
+    "curved_lines.instruction.umbrella_draw": 'Gambar payung, dari lingkaran ke lingkaran.',
+})
+
+# --- wavy_lines ---
+STRINGS.update({
+    "wavy_lines.title": 'Garis Bergelombang',
+    "wavy_lines.instruction.sea_one": 'Tebalkan ombak besar dari ikan ke kerang.',
+    "wavy_lines.instruction.sea_two": 'Tebalkan ombaknya. Naik turun, naik turun.',
+    "wavy_lines.instruction.snake": 'Tebalkan ular yang berlekuk sampai apel.',
+    "wavy_lines.instruction.river": 'Tebalkan sungai berkelok dari gunung ke danau.',
+    "wavy_lines.instruction.hair": 'Tebalkan rambut bergelombang di bawah setiap pita.',
+    "wavy_lines.instruction.sea_dots": 'Tebalkan ombak laut. Ikuti titik-titiknya.',
+    "wavy_lines.instruction.snake_dots": 'Tebalkan ular-ular itu. Ikuti titik-titiknya.',
+    "wavy_lines.instruction.hair_dots": 'Tebalkan rambut bergelombang. Ikuti titik-titiknya.',
+    "wavy_lines.instruction.sea_draw": 'Gambar ombak, dari lingkaran ke lingkaran.',
+    "wavy_lines.instruction.river_draw": 'Gambar sungai, dari lingkaran ke lingkaran.',
+})
+
+# --- circles_spirals ---
+STRINGS.update({
+    "circles_spirals.title": 'Lingkaran & Spiral',
+    "circles_spirals.instruction.ball": 'Tebalkan bola. Mulai dari atas.',
+    "circles_spirals.instruction.sun": 'Tebalkan matahari di atas setiap rumah.',
+    "circles_spirals.instruction.wheel": 'Tebalkan kedua roda setiap mobil.',
+    "circles_spirals.instruction.target": 'Tebalkan semua lingkaran pada setiap sasaran.',
+    "circles_spirals.instruction.snail": 'Tebalkan cangkang keong. Putar dan putar.',
+    "circles_spirals.instruction.bubble": 'Tebalkan gelembung di atas ikan.',
+    "circles_spirals.instruction.bike": 'Tebalkan kedua roda setiap sepeda.',
+    "circles_spirals.instruction.snail_out": 'Tebalkan cangkang keong dari tengah ke luar.',
+    "circles_spirals.instruction.target_draw": 'Gambar sasaran, dari lingkaran ke lingkaran.',
+    "circles_spirals.instruction.snail_draw": 'Gambar cangkang dari tengah, dari lingkaran ke lingkaran.',
+})
